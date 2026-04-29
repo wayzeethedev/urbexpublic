@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vestige</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+background:#fff;
+color:#111;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+overflow:hidden;
+}
+
+.container{
+width:100%;
+max-width:420px;
+text-align:center;
+}
+
+.logo{width:88px}
+
+h1{font-size:34px;margin:10px 0 0;font-weight:600}
+h2{font-size:15px;font-weight:400;color:#666;margin-top:6px}
+
+p{
+font-size:14px;
+color:#666;
+line-height:1.5;
+margin:18px 0;
+}
+
+button{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #ddd;
+background:#111;
+color:#fff;
+font-size:14px;
+cursor:pointer;
+transition:opacity 0.2s;
+}
+
+button:hover{opacity:0.9}
+button:disabled{opacity:0.5;cursor:not-allowed}
+
+.footer{
+margin-top:14px;
+font-size:13px;
+color:#777;
+}
+
+#invite-modal{
+position:fixed;
+inset:0;
+display:none;
+z-index:9999;
+}
+
+#invite-modal-backdrop{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.6);
+}
+
+#invite-modal-box{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:92%;
+max-width:420px;
+max-height:85vh;
+overflow-y:auto;
+background:#fff;
+border-radius:16px;
+padding:20px;
+box-shadow:0 20px 60px rgba(0,0,0,0.25);
+}
+
+@media(max-width:520px){
+#invite-modal-box{
+left:0;
+bottom:0;
+top:auto;
+transform:none;
+width:100%;
+max-width:100%;
+border-radius:18px 18px 0 0;
+max-height:88vh;
+}
+}
+
+#close-modal-btn{
+position:absolute;
+top:14px;
+right:14px;
+width:40px;
+height:40px;
+border-radius:999px;
+border:1px solid #eee;
+background:#fff;
+font-size:18px;
+font-weight:700;
+color:#111;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+z-index:10;
+box-shadow:0 10px 25px rgba(0,0,0,0.10);
+transition:all 0.2s;
+}
+
+#close-modal-btn:hover{
+background:#f5f5f5;
+transform:scale(1.05);
+}
+
+h3{
+margin:6px 0 6px;
+font-size:20px;
+}
+
+.modal-desc{
+margin:0 0 16px;
+font-size:13px;
+color:#666;
+}
+
+.field{
+margin-bottom:12px;
+text-align:left;
+}
+
+label{
+font-size:12px;
+color:#444;
+display:block;
+margin-bottom:6px;
+}
+
+input,textarea{
+width:100%;
+padding:11px 12px;
+border-radius:10px;
+border:1px solid #e5e5e5;
+background:#fafafa;
+font-size:16px;
+outline:none;
+transition:all 0.2s;
+}
+
+input:focus,textarea:focus{
+background:#fff;
+border-color:#111;
+}
+
+#form-error{
+display:none;
+background:#ffe9e9;
+color:#b00020;
+padding:10px;
+border-radius:10px;
+font-size:13px;
+margin-bottom:12px;
+}
+
+#success{
+display:none;
+text-align:center;
+padding:30px 10px;
+}
+
+#success svg{
+width:50px;
+height:50px;
+margin-bottom:15px;
+}
+
+#success h4{
+margin:0 0 8px;
+font-size:18px;
+color:#111;
+}
+
+#success p{
+margin:0;
+font-size:13px;
+}
+
+.loader{
+display:inline-block;
+width:16px;
+height:16px;
+border:2px solid #fff;
+border-top-color:transparent;
+border-radius:50%;
+animation:spin 0.6s linear infinite;
+margin-right:8px;
+vertical-align:middle;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
+<h1>Vestige</h1>
+<h2>Invite-only community</h2>
+
+<p>Private access only. Request an invite to join.</p>
+
+<button id="open">Request Invite</button>
+
+<div class="footer">
+Already have an invite? <a href="#">Login</a>
+</div>
+</div>
+
+<div id="invite-modal">
+<div id="invite-modal-backdrop"></div>
+
+<div id="invite-modal-box">
+<button id="close-modal-btn">✕</button>
+
+<div id="form-container">
+<h3>Request Invite</h3>
+<p class="modal-desc">Enter your details below.</p>
+
+<form id="form">
+<div class="field">
+<label>Name</label>
+<input id="name" type="text" autocomplete="name"/>
+</div>
+
+<div class="field">
+<label>Email</label>
+<input id="email" type="email" autocomplete="email"/>
+</div>
+
+<div class="field">
+<label>Comments <span style="color:#999;">(optional)</span></label>
+<textarea id="comments" rows="3"></textarea>
+</div>
+
+<div id="form-error"></div>
+
+<button type="submit" id="submit-btn">Send Request</button>
+</form>
+</div>
+
+<div id="success">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+<polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+<h4>Request Received!</h4>
+<p>We'll notify you when you're invited.</p>
+</div>
+
+</div>
+</div>
+
+<script>
+const modal = document.getElementById('invite-modal');
+const openBtn = document.getElementById('open');
+const closeBtn = document.getElementById('close-modal-btn');
+const backdrop = document.getElementById('invite-modal-backdrop');
+const formContainer = document.getElementById('form-container');
+const form = document.getElementById('form');
+const errorBox = document.getElementById('form-error');
+const successDiv = document.getElementById('success');
+const submitBtn = document.getElementById('submit-btn');
+
+function openModal() {
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // Reset form state
+  formContainer.style.display = 'block';
+  successDiv.style.display = 'none';
+  form.reset();
+  errorBox.style.display = 'none';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send Request';
+}
+
+function closeModal() {
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function showError(message) {
+  errorBox.textContent = message;
+  errorBox.style.display = 'block';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send Request';
+}
+
+openBtn.onclick = openModal;
+closeBtn.onclick = closeModal;
+backdrop.onclick = closeModal;
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  errorBox.style.display = 'none';
+  
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const comments = document.getElementById('comments').value.trim();
+
+  // Client-side validation
+  if (!name) {
+    showError('Please enter your name.');
+    return;
+  }
+  
+  if (!email) {
+    showError('Please enter your email address.');
+    return;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showError('Please enter a valid email address.');
+    return;
+  }
+
+  // Disable button and show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="loader"></span>Sending...';
+
+  try {
+    const response = await fetch('/api/request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, comments }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Show success message
+      formContainer.style.display = 'none';
+      successDiv.style.display = 'block';
+      
+      // Auto-close modal after 3 seconds
+      setTimeout(() => {
+        closeModal();
+      }, 3000);
+    } else {
+      showError(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Network error. Please check your connection and try again.');
+  }
+};
+</script>
+
+</body>
+</html>
