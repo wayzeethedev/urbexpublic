@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Map - Vestige</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+background:#fff;
+color:#111;
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:1200px;
+margin:0 auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 0;
+border-bottom:2px solid #f0f0f0;
+margin-bottom:30px;
+}
+
+.logo{
+width:60px;
+}
+
+h1{
+font-size:28px;
+margin:0;
+font-weight:600;
+}
+
+.user-info{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logout-btn{
+background:#111;
+color:#fff;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+cursor:pointer;
+font-size:14px;
+}
+
+.logout-btn:hover{
+opacity:0.9;
+}
+
+.map-placeholder{
+background:#f8f8f8;
+border-radius:12px;
+padding:100px 20px;
+text-align:center;
+border:2px dashed #ddd;
+}
+
+.map-placeholder h3{
+margin:0 0 10px 0;
+color:#666;
+}
+
+.map-placeholder p{
+color:#999;
+margin:0;
+}
+
+.loading{
+text-align:center;
+padding:50px;
+}
+
+.error{
+text-align:center;
+padding:50px;
+color:#b00020;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<div class="header">
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
+<h1>Explorer Map</h1>
+<div class="user-info">
+<span id="user-name"></span>
+<button class="logout-btn" id="logout-btn">Logout</button>
+</div>
+</div>
+
+<div id="loading" class="loading">
+<div class="loading-spinner"></div>
+<p>Loading...</p>
+</div>
+
+<div id="map-content" style="display:none;">
+<div class="map-placeholder">
+<h3>🗺️ Interactive Map Coming Soon</h3>
+<p>This is where the urban exploration map will be displayed.</p>
+</div>
+</div>
+
+<div id="error" class="error" style="display:none;">
+<p>Please <a href="/login.html">login</a> to access this page.</p>
+</div>
+</div>
+
+<style>
+.loading-spinner{
+display:inline-block;
+width:40px;
+height:40px;
+border:3px solid #f3f3f3;
+border-top:3px solid #111;
+border-radius:50%;
+animation:spin 0.8s linear infinite;
+margin-bottom:15px;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+</style>
+
+<script>
+// Check authentication on page load
+async function checkAuth() {
+  try {
+    const response = await fetch('/api/check-auth', {
+      credentials: 'include' // Include cookies
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      displayUserInfo(data.user);
+    } else {
+      showUnauthorized();
+    }
+  } catch (error) {
+    console.error('Auth error:', error);
+    showUnauthorized();
+  }
+}
+
+function displayUserInfo(user) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('map-content').style.display = 'block';
+  document.getElementById('user-name').textContent = `${user.firstName} ${user.lastName}`;
+}
+
+function showUnauthorized() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error').style.display = 'block';
+  
+  // Redirect to login after 3 seconds
+  setTimeout(() => {
+    window.location.href = '/login.html';
+  }, 3000);
+}
+
+// Logout function
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try {
+    await fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    
+    // Clear local storage
+    localStorage.removeItem('vestige_user');
+    
+    // Redirect to login
+    window.location.href = '/login.html';
+  } catch (error) {
+    console.error('Logout error:', error);
+    window.location.href = '/login.html';
+  }
+});
+
+// Check auth when page loads
+checkAuth();
+</script>
+</body>
+</html>

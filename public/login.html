@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login - Vestige</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+background:#fff;
+color:#111;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.container{
+width:100%;
+max-width:420px;
+text-align:center;
+}
+
+.logo{
+width:88px;
+margin-bottom:10px;
+}
+
+h1{
+font-size:34px;
+margin:0;
+font-weight:600;
+}
+
+h2{
+font-size:15px;
+font-weight:400;
+color:#666;
+margin-top:6px;
+margin-bottom:24px;
+}
+
+.form-container{
+text-align:left;
+margin-top:20px;
+}
+
+.field{
+margin-bottom:16px;
+}
+
+label{
+font-size:13px;
+color:#444;
+display:block;
+margin-bottom:6px;
+font-weight:500;
+}
+
+input{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #e5e5e5;
+background:#fafafa;
+font-size:16px;
+outline:none;
+transition:all 0.2s;
+}
+
+input:focus{
+background:#fff;
+border-color:#111;
+}
+
+button{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #ddd;
+background:#111;
+color:#fff;
+font-size:14px;
+font-weight:500;
+cursor:pointer;
+transition:opacity 0.2s;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
+.loader{
+display:inline-block;
+width:16px;
+height:16px;
+border:2px solid #fff;
+border-top-color:transparent;
+border-radius:50%;
+animation:spin 0.6s linear infinite;
+margin-right:8px;
+vertical-align:middle;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+#error-message{
+display:none;
+background:#ffe9e9;
+color:#b00020;
+padding:12px;
+border-radius:10px;
+font-size:13px;
+margin-bottom:16px;
+border:1px solid #ffcdcd;
+}
+
+.footer{
+margin-top:20px;
+font-size:13px;
+color:#777;
+text-align:center;
+}
+
+.footer a{
+color:#111;
+text-decoration:none;
+font-weight:500;
+}
+
+.footer a:hover{
+text-decoration:underline;
+}
+
+.back-link{
+display:inline-block;
+margin-top:20px;
+color:#666;
+text-decoration:none;
+font-size:13px;
+}
+
+.back-link:hover{
+color:#111;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
+<h1>Vestige</h1>
+<h2>Sign in to your account</h2>
+
+<div class="form-container">
+<div id="error-message"></div>
+
+<form id="login-form">
+<div class="field">
+<label>Username or Email</label>
+<input 
+  id="identifier" 
+  type="text" 
+  autocomplete="username" 
+  placeholder="username or email@example.com"
+  required
+/>
+</div>
+
+<div class="field">
+<label>Password</label>
+<input 
+  id="password" 
+  type="password" 
+  autocomplete="current-password" 
+  placeholder="Enter your password"
+  required
+/>
+</div>
+
+<button type="submit" id="submit-btn">Sign In</button>
+</form>
+
+<div class="footer">
+Don't have an account? <a href="/">Request Access</a>
+</div>
+
+<a href="/" class="back-link">← Back to home</a>
+</div>
+</div>
+
+<script>
+// Check if already logged in
+async function checkAuth() {
+  try {
+    const response = await fetch('/api/check-auth', {
+      credentials: 'include' // Include cookies
+    });
+    
+    if (response.ok) {
+      // Already logged in, redirect to map
+      window.location.href = '/map.html';
+    }
+  } catch (error) {
+    // Not logged in, that's fine
+    console.log('Not authenticated');
+  }
+}
+
+// Run auth check on page load
+checkAuth();
+
+const form = document.getElementById('login-form');
+const identifierInput = document.getElementById('identifier');
+const passwordInput = document.getElementById('password');
+const submitBtn = document.getElementById('submit-btn');
+const errorMessageDiv = document.getElementById('error-message');
+
+function showError(message) {
+  errorMessageDiv.textContent = message;
+  errorMessageDiv.style.display = 'block';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Sign In';
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  errorMessageDiv.style.display = 'none';
+  
+  const identifier = identifierInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!identifier) {
+    showError('Please enter your username or email.');
+    return;
+  }
+  
+  if (!password) {
+    showError('Please enter your password.');
+    return;
+  }
+
+  // Disable button and show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="loader"></span>Signing In...';
+
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Important: This includes cookies
+      body: JSON.stringify({ identifier, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Store user info in localStorage for quick access (not sensitive)
+      localStorage.setItem('vestige_user', JSON.stringify(data.user));
+      
+      // Redirect to map page
+      window.location.href = '/map.html';
+    } else {
+      showError(data.error || 'Invalid credentials. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Network error. Please check your connection and try again.');
+  } finally {
+    if (errorMessageDiv.style.display === 'block') {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+    }
+  }
+};
+</script>
+
+</body>
+</html>

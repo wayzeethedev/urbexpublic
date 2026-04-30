@@ -214,12 +214,45 @@ vertical-align:middle;
 @keyframes spin{
 to{transform:rotate(360deg)}
 }
+
+/* Loading overlay for auth check */
+#auth-loading{
+position:fixed;
+inset:0;
+background:#fff;
+z-index:10000;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+gap:20px;
+}
+
+.auth-spinner{
+width:50px;
+height:50px;
+border:3px solid #f0f0f0;
+border-top:3px solid #111;
+border-radius:50%;
+animation:spin 0.8s linear infinite;
+}
+
+.auth-text{
+font-size:14px;
+color:#666;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- Loading overlay for auth check -->
+<div id="auth-loading">
+<div class="auth-spinner"></div>
+<div class="auth-text">Checking authentication...</div>
+</div>
+
+<div class="container" style="display:none;">
 <img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
 <h1>Vestige</h1>
 <h2>Invite-only community</h2>
@@ -229,7 +262,7 @@ to{transform:rotate(360deg)}
 <button id="open">Request Invite</button>
 
 <div class="footer">
-Already have an invite? <a href="#">Login</a>
+Already have an invite? <a href="/login.html">Login</a>
 </div>
 </div>
 
@@ -278,6 +311,34 @@ Already have an invite? <a href="#">Login</a>
 </div>
 
 <script>
+// IMMEDIATELY check if user is logged in
+async function checkAuthAndRedirect() {
+  try {
+    const response = await fetch('/api/check-auth', {
+      credentials: 'include' // Include cookies
+    });
+    
+    if (response.ok) {
+      // User is logged in, redirect to map page immediately
+      window.location.href = '/map.html';
+      return; // Stop execution
+    } else {
+      // Not logged in, show the page
+      document.getElementById('auth-loading').style.display = 'none';
+      document.querySelector('.container').style.display = 'block';
+    }
+  } catch (error) {
+    // Error or not logged in, show the page
+    console.log('Auth check failed:', error);
+    document.getElementById('auth-loading').style.display = 'none';
+    document.querySelector('.container').style.display = 'block';
+  }
+}
+
+// Run auth check immediately when page loads
+checkAuthAndRedirect();
+
+// Rest of your modal code
 const modal = document.getElementById('invite-modal');
 const openBtn = document.getElementById('open');
 const closeBtn = document.getElementById('close-modal-btn');

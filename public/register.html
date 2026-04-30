@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Complete Registration - Vestige</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+background:#fff;
+color:#111;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.container{
+width:100%;
+max-width:500px;
+text-align:center;
+}
+
+.logo{
+width:88px;
+margin-bottom:10px;
+}
+
+h1{
+font-size:34px;
+margin:0;
+font-weight:600;
+}
+
+h2{
+font-size:15px;
+font-weight:400;
+color:#666;
+margin-top:6px;
+margin-bottom:24px;
+}
+
+.form-container{
+text-align:left;
+margin-top:20px;
+}
+
+.field{
+margin-bottom:16px;
+}
+
+label{
+font-size:13px;
+color:#444;
+display:block;
+margin-bottom:6px;
+font-weight:500;
+}
+
+input{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #e5e5e5;
+background:#fafafa;
+font-size:16px;
+outline:none;
+transition:all 0.2s;
+}
+
+input:focus{
+background:#fff;
+border-color:#111;
+}
+
+input:disabled{
+background:#f0f0f0;
+color:#666;
+cursor:not-allowed;
+}
+
+.checkbox-field{
+display:flex;
+align-items:flex-start;
+gap:10px;
+margin-bottom:20px;
+}
+
+.checkbox-field input{
+width:auto;
+margin-top:2px;
+}
+
+.checkbox-field label{
+margin-bottom:0;
+font-size:12px;
+color:#666;
+line-height:1.4;
+}
+
+.checkbox-field a{
+color:#111;
+text-decoration:none;
+font-weight:500;
+}
+
+.checkbox-field a:hover{
+text-decoration:underline;
+}
+
+button{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #ddd;
+background:#111;
+color:#fff;
+font-size:14px;
+font-weight:500;
+cursor:pointer;
+transition:opacity 0.2s;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
+.loader{
+display:inline-block;
+width:16px;
+height:16px;
+border:2px solid #fff;
+border-top-color:transparent;
+border-radius:50%;
+animation:spin 0.6s linear infinite;
+margin-right:8px;
+vertical-align:middle;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+#error-message{
+display:none;
+background:#ffe9e9;
+color:#b00020;
+padding:12px;
+border-radius:10px;
+font-size:13px;
+margin-bottom:16px;
+border:1px solid #ffcdcd;
+}
+
+#success-message{
+display:none;
+text-align:center;
+padding:30px 20px;
+background:#f0fdf4;
+border-radius:12px;
+margin-top:20px;
+}
+
+#success-message svg{
+width:50px;
+height:50px;
+margin-bottom:15px;
+color:#15803d;
+}
+
+#success-message h4{
+margin:0 0 8px;
+font-size:18px;
+color:#111;
+}
+
+#success-message p{
+margin:0;
+font-size:13px;
+color:#666;
+}
+
+.info-card{
+background:#f8f8f8;
+border-radius:12px;
+padding:16px;
+margin-bottom:20px;
+border:1px solid #e5e5e5;
+}
+
+.info-row{
+display:flex;
+justify-content:space-between;
+padding:8px 0;
+font-size:14px;
+border-bottom:1px solid #e5e5e5;
+}
+
+.info-row:last-child{
+border-bottom:none;
+}
+
+.info-label{
+font-weight:500;
+color:#444;
+}
+
+.info-value{
+color:#111;
+font-weight:500;
+}
+
+.requirements{
+font-size:11px;
+color:#888;
+margin-top:5px;
+}
+
+.password-match{
+font-size:11px;
+margin-top:5px;
+}
+
+.password-match.valid{
+color:#15803d;
+}
+
+.password-match.invalid{
+color:#b00020;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
+<h1>Complete Registration</h1>
+<h2>Create your account</h2>
+
+<div class="form-container">
+<div id="error-message"></div>
+<div id="success-message"></div>
+
+<div id="registration-form">
+<div class="info-card">
+<div class="info-row">
+<span class="info-label">Email:</span>
+<span class="info-value" id="display-email"></span>
+</div>
+<div class="info-row">
+<span class="info-label">Name:</span>
+<span class="info-value" id="display-name"></span>
+</div>
+</div>
+
+<form id="register-form">
+<div class="field">
+<label>Username (3-30 characters, letters, numbers, underscores only)</label>
+<input 
+  id="username" 
+  type="text" 
+  autocomplete="username" 
+  placeholder="e.g., urban_explorer_2024"
+  required
+/>
+<div class="requirements">Used for login - must be unique</div>
+</div>
+
+<div class="field">
+<label>Password (minimum 8 characters)</label>
+<input 
+  id="password" 
+  type="password" 
+  autocomplete="new-password" 
+  placeholder="Create a strong password"
+  required
+/>
+</div>
+
+<div class="field">
+<label>Confirm Password</label>
+<input 
+  id="confirm-password" 
+  type="password" 
+  autocomplete="new-password" 
+  placeholder="Confirm your password"
+  required
+/>
+<div id="password-match" class="password-match"></div>
+</div>
+
+<div class="checkbox-field">
+<input type="checkbox" id="accept-terms" required/>
+<label>
+  I agree to the <a href="#" id="terms-link">Terms & Conditions</a> and acknowledge that 
+  <strong>Vestige is not responsible for any injuries, damages, or legal consequences</strong> 
+  that may occur while participating in activities organized through this platform.
+</label>
+</div>
+
+<button type="submit" id="submit-btn">Create Account</button>
+</form>
+</div>
+</div>
+</div>
+
+<script>
+// Remove token from URL immediately
+const urlParams = new URLSearchParams(window.location.search);
+const accessToken = urlParams.get('token');
+
+if (!accessToken) {
+  window.location.href = '/';
+}
+
+// Remove token from URL without refreshing
+window.history.replaceState({}, document.title, '/register.html');
+
+let verifiedData = null;
+
+// Verify token on page load
+async function verifyToken() {
+  try {
+    const response = await fetch('/api/verify-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: accessToken }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Invalid access token');
+    }
+
+    verifiedData = data;
+    
+    // Display user info
+    document.getElementById('display-email').textContent = data.email;
+    document.getElementById('display-name').textContent = `${data.firstName} ${data.lastName}`;
+    
+  } catch (error) {
+    document.getElementById('error-message').textContent = error.message;
+    document.getElementById('error-message').style.display = 'block';
+    document.getElementById('registration-form').style.display = 'none';
+  }
+}
+
+// Password match validation
+const password = document.getElementById('password');
+const confirmPassword = document.getElementById('confirm-password');
+const passwordMatchDiv = document.getElementById('password-match');
+
+function validatePasswordMatch() {
+  if (password.value !== confirmPassword.value) {
+    passwordMatchDiv.textContent = '✗ Passwords do not match';
+    passwordMatchDiv.className = 'password-match invalid';
+    return false;
+  } else if (password.value.length > 0 && confirmPassword.value.length > 0) {
+    passwordMatchDiv.textContent = '✓ Passwords match';
+    passwordMatchDiv.className = 'password-match valid';
+    return true;
+  }
+  return false;
+}
+
+password.addEventListener('input', validatePasswordMatch);
+confirmPassword.addEventListener('input', validatePasswordMatch);
+
+// Form submission
+const form = document.getElementById('register-form');
+const submitBtn = document.getElementById('submit-btn');
+const errorMessageDiv = document.getElementById('error-message');
+const successMessageDiv = document.getElementById('success-message');
+const registrationForm = document.getElementById('registration-form');
+
+function showError(message) {
+  errorMessageDiv.textContent = message;
+  errorMessageDiv.style.display = 'block';
+  successMessageDiv.style.display = 'none';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Create Account';
+}
+
+function showSuccess(message) {
+  successMessageDiv.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <h4>Registration Complete!</h4>
+    <p>${message}</p>
+  `;
+  successMessageDiv.style.display = 'block';
+  errorMessageDiv.style.display = 'none';
+  registrationForm.style.display = 'none';
+  
+  setTimeout(() => {
+    window.location.href = '/login.html';
+  }, 3000);
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  errorMessageDiv.style.display = 'none';
+  
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  const acceptTerms = document.getElementById('accept-terms').checked;
+
+  // Validation
+  if (!username) {
+    showError('Please choose a username.');
+    return;
+  }
+  
+  if (username.length < 3 || username.length > 30) {
+    showError('Username must be between 3 and 30 characters.');
+    return;
+  }
+  
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+  if (!usernameRegex.test(username)) {
+    showError('Username can only contain letters, numbers, and underscores.');
+    return;
+  }
+  
+  if (!password) {
+    showError('Please create a password.');
+    return;
+  }
+  
+  if (password.length < 8) {
+    showError('Password must be at least 8 characters.');
+    return;
+  }
+  
+  if (password !== confirmPassword) {
+    showError('Passwords do not match.');
+    return;
+  }
+  
+  if (!acceptTerms) {
+    showError('You must accept the terms and policies to continue.');
+    return;
+  }
+
+  // Disable button and show loading
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="loader"></span>Creating Account...';
+
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: accessToken,
+        username: username,
+        password: password,
+        acceptedTerms: acceptTerms
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      showSuccess('Your account has been created! Redirecting to login...');
+    } else {
+      showError(data.error || 'Registration failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Network error. Please check your connection and try again.');
+  }
+};
+
+// Load the token verification
+verifyToken();
+</script>
+
+</body>
+</html>

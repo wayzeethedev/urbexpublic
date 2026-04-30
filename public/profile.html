@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profile - Vestige</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f5f5f5;
+    padding-bottom: 70px;
+}
+
+/* Header/Banner */
+.header {
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    background-color: #333;
+}
+
+/* Profile Row */
+.profile-row {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 20px;
+    margin-top: -60px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.pfp {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.username-section {
+    flex: 1;
+}
+
+.username {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    color: #111;
+}
+
+.user-handle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.edit-profile-btn {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.edit-profile-btn:hover {
+    opacity: 0.9;
+}
+
+/* Description */
+.description {
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+.description p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Stats Box */
+.statbox {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.rank-badge {
+    background: #111;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 90%;
+    width: 450px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 22px;
+}
+
+.edit-field {
+    margin-bottom: 20px;
+}
+
+.edit-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+.edit-field input,
+.edit-field textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    background: #fafafa;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.edit-field input:focus,
+.edit-field textarea:focus {
+    background: #fff;
+    border-color: #111;
+}
+
+.edit-field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.photo-upload-section {
+    margin-bottom: 20px;
+}
+
+.photo-upload-section label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+.photo-upload-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.photo-btn {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    flex: 1;
+    text-align: center;
+}
+
+.photo-btn:hover {
+    background: #e5e5e5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-btn {
+    flex: 1;
+    background: #111;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cancel-btn {
+    flex: 1;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+.cancel-btn:hover {
+    background: #e5e5e5;
+}
+
+.danger-zone {
+    border-top: 2px solid #ffe9e9;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+.danger-zone h4 {
+    color: #b00020;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+}
+
+.danger-btn {
+    background: white;
+    color: #b00020;
+    border: 1px solid #ffcdcd;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    width: 100%;
+}
+
+.danger-btn:hover {
+    background: #ffe9e9;
+}
+
+/* Bottom Navigation */
+.navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #777;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+
+.nav-item.active {
+    color: #ff3b3b;
+}
+
+.nav-item:hover {
+    color: #111;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    z-index: 1000;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0f0f0;
+    border-top: 3px solid #111;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}
+
+#photo-upload, #cover-upload {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading profile...</p>
+</div>
+
+<div id="profile-content" style="display:none;">
+    <!-- Banner -->
+    <div class="header" id="banner"></div>
+
+    <!-- Profile Row -->
+    <div class="profile-row">
+        <img class="pfp" id="profile-pic" src="https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" alt="profile picture">
+        <div class="username-section">
+            <h2 class="username" id="display-name"></h2>
+            <p class="user-handle" id="user-handle"></p>
+            <button class="edit-profile-btn" id="edit-profile-btn">
+                <i class="fa-solid fa-pen"></i> Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="description">
+        <p id="user-bio"></p>
+    </div>
+
+    <!-- Stats -->
+    <div class="statbox">
+        <div class="stat-item">
+            <h3 class="stat-number" id="locations-unlocked">0/100</h3>
+            <p class="stat-label">Locations Unlocked</p>
+        </div>
+        <div class="stat-item">
+            <h3 class="stat-number" id="locations-explored">0</h3>
+            <p class="stat-label">Locations Explored</p>
+        </div>
+        <div class="stat-item">
+            <h3 class="stat-number" id="points">0</h3>
+            <p class="stat-label">Points</p>
+        </div>
+        <div class="stat-item">
+            <span class="rank-badge" id="rank">Novice</span>
+            <p class="stat-label">Rank</p>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Profile</h3>
+        
+        <div class="photo-upload-section">
+            <label>Profile Picture</label>
+            <div class="photo-upload-buttons">
+                <button class="photo-btn" id="change-photo-btn">
+                    <i class="fa-solid fa-camera"></i> Upload Photo
+                </button>
+                <button class="photo-btn" id="remove-photo-btn">
+                    <i class="fa-solid fa-trash"></i> Remove
+                </button>
+            </div>
+        </div>
+
+        <div class="photo-upload-section">
+            <label>Cover Photo</label>
+            <div class="photo-upload-buttons">
+                <button class="photo-btn" id="change-cover-btn">
+                    <i class="fa-solid fa-camera"></i> Upload Cover
+                </button>
+                <button class="photo-btn" id="remove-cover-btn">
+                    <i class="fa-solid fa-trash"></i> Remove
+                </button>
+            </div>
+        </div>
+
+        <div class="edit-field">
+            <label>Display Name</label>
+            <input type="text" id="edit-display-name" placeholder="Your display name">
+        </div>
+
+        <div class="edit-field">
+            <label>Bio</label>
+            <textarea id="edit-bio" placeholder="Tell us about yourself..."></textarea>
+        </div>
+
+        <div class="danger-zone">
+            <h4><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h4>
+            <button id="delete-account-modal-btn" class="danger-btn">Delete Account</button>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="cancel-btn" id="cancel-edit-btn">Cancel</button>
+            <button class="save-btn" id="save-profile-btn">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="photo-upload" accept="image/*">
+<input type="file" id="cover-upload" accept="image/*">
+
+<!-- Bottom Navigation -->
+<div class="navbar">
+    <a href="/map.html" class="nav-item">
+        <i class="fa-solid fa-map"></i>
+        Map
+    </a>
+    <a href="/profile.html" class="nav-item active">
+        <i class="fa-solid fa-user"></i>
+        Profile
+    </a>
+</div>
+
+<script>
+let currentUser = null;
+let currentProfile = null;
+
+// Check authentication via cookie
+async function checkAuth() {
+    try {
+        console.log('Checking authentication...');
+        const response = await fetch('/api/check-auth', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Auth response status:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Auth data:', data);
+            if (data.authenticated && data.user) {
+                currentUser = data.user;
+                return currentUser;
+            } else {
+                throw new Error('Not authenticated');
+            }
+        } else {
+            throw new Error('Auth failed');
+        }
+    } catch (error) {
+        console.error('Auth error:', error);
+        window.location.href = '/login.html';
+        return null;
+    }
+}
+
+// Load profile for current logged in user
+async function loadProfile() {
+    if (!currentUser || !currentUser.username) {
+        console.error('No current user or username:', currentUser);
+        return;
+    }
+    
+    console.log('Loading profile for username:', currentUser.username);
+    
+    try {
+        const response = await fetch(`/api/profile/${currentUser.username}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Profile response status:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Profile data:', data);
+            currentProfile = data;
+            displayProfile(data);
+        } else {
+            console.error('Failed to load profile, status:', response.status);
+            // Create default profile from user data
+            const defaultProfile = {
+                username: currentUser.username,
+                displayName: currentUser.displayName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim(),
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                bio: 'No bio yet. Click edit to add one!',
+                locationsUnlocked: 0,
+                locationsExplored: 0,
+                points: 0,
+                totalLocations: 100,
+                profilePic: null,
+                coverPhoto: null
+            };
+            currentProfile = defaultProfile;
+            displayProfile(defaultProfile);
+        }
+    } catch (error) {
+        console.error('Load profile error:', error);
+    }
+}
+
+function displayProfile(profile) {
+    console.log('Displaying profile:', profile);
+    
+    // Set display name - use username as fallback
+    const displayName = profile.displayName || profile.username;
+    document.getElementById('display-name').textContent = displayName;
+    document.getElementById('user-handle').textContent = `@${profile.username}`;
+    document.getElementById('user-bio').textContent = profile.bio || 'No bio yet. Click edit to add one!';
+    
+    // Set stats (placeholder values for now)
+    document.getElementById('locations-unlocked').textContent = `0/100`;
+    document.getElementById('locations-explored').textContent = '0';
+    document.getElementById('points').textContent = '0';
+    document.getElementById('rank').textContent = 'Novice';
+    
+    // Set profile picture - use default if none
+    if (profile.profilePic) {
+        document.getElementById('profile-pic').src = profile.profilePic;
+    } else {
+        document.getElementById('profile-pic').src = 'https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg';
+    }
+    
+    // Set cover photo - use default if none
+    if (profile.coverPhoto) {
+        document.getElementById('banner').style.backgroundImage = `url(${profile.coverPhoto})`;
+    } else {
+        document.getElementById('banner').style.backgroundImage = 'url("https://www.eventx.om/uploads/default-speaker-cover.jpg")';
+    }
+    
+    // Fill edit form
+    document.getElementById('edit-display-name').value = profile.displayName || '';
+    document.getElementById('edit-bio').value = profile.bio || '';
+}
+
+// Upload profile picture
+async function uploadProfilePicture(file) {
+    const formData = new FormData();
+    formData.append('photo', file);
+    
+    try {
+        const response = await fetch('/api/profile/upload-photo', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('profile-pic').src = data.photoUrl;
+            if (currentProfile) currentProfile.profilePic = data.photoUrl;
+            showToast('Profile picture updated!');
+            return data.photoUrl;
+        } else {
+            showToast('Failed to upload photo', 'error');
+            return null;
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        showToast('Network error', 'error');
+        return null;
+    }
+}
+
+// Upload cover photo
+async function uploadCoverPhoto(file) {
+    const formData = new FormData();
+    formData.append('photo', file);
+    
+    try {
+        const response = await fetch('/api/profile/upload-cover', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('banner').style.backgroundImage = `url(${data.photoUrl})`;
+            if (currentProfile) currentProfile.coverPhoto = data.photoUrl;
+            showToast('Cover photo updated!');
+            return data.photoUrl;
+        } else {
+            showToast('Failed to upload cover', 'error');
+            return null;
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        showToast('Network error', 'error');
+        return null;
+    }
+}
+
+// Remove profile picture (set to default)
+async function removeProfilePicture() {
+    try {
+        const response = await fetch('/api/profile/remove-photo', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            document.getElementById('profile-pic').src = 'https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg';
+            if (currentProfile) currentProfile.profilePic = null;
+            showToast('Profile picture removed');
+        } else {
+            showToast('Failed to remove photo', 'error');
+        }
+    } catch (error) {
+        console.error('Remove error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+// Remove cover photo (set to default)
+async function removeCoverPhoto() {
+    try {
+        const response = await fetch('/api/profile/remove-cover', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            document.getElementById('banner').style.backgroundImage = 'url("https://www.eventx.om/uploads/default-speaker-cover.jpg")';
+            if (currentProfile) currentProfile.coverPhoto = null;
+            showToast('Cover photo removed');
+        } else {
+            showToast('Failed to remove cover', 'error');
+        }
+    } catch (error) {
+        console.error('Remove error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+// Save profile settings
+async function saveProfileSettings() {
+    const settings = {
+        displayName: document.getElementById('edit-display-name').value,
+        bio: document.getElementById('edit-bio').value
+    };
+    
+    try {
+        const response = await fetch('/api/profile/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(settings)
+        });
+        
+        if (response.ok) {
+            showToast('Profile updated!');
+            // Update display
+            if (currentProfile) {
+                currentProfile.displayName = settings.displayName;
+                currentProfile.bio = settings.bio;
+            }
+            const displayName = settings.displayName || currentUser.username;
+            document.getElementById('display-name').textContent = displayName;
+            document.getElementById('user-bio').textContent = settings.bio || 'No bio yet. Click edit to add one!';
+            closeModal();
+        } else {
+            showToast('Failed to update profile', 'error');
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+// Delete account
+async function deleteAccount() {
+    if (confirm('⚠️ Are you sure? This will permanently delete your account and all data. This cannot be undone.')) {
+        const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+        if (confirmation === 'DELETE') {
+            try {
+                const response = await fetch('/api/profile/delete', {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    showToast('Account deleted');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showToast('Failed to delete account', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast('Network error', 'error');
+            }
+        }
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Modal functions
+function openModal() {
+    document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+// Event listeners
+document.getElementById('edit-profile-btn').addEventListener('click', openModal);
+document.getElementById('cancel-edit-btn').addEventListener('click', closeModal);
+document.getElementById('save-profile-btn').addEventListener('click', saveProfileSettings);
+
+document.getElementById('change-photo-btn').addEventListener('click', () => {
+    document.getElementById('photo-upload').click();
+});
+
+document.getElementById('change-cover-btn').addEventListener('click', () => {
+    document.getElementById('cover-upload').click();
+});
+
+document.getElementById('remove-photo-btn').addEventListener('click', removeProfilePicture);
+document.getElementById('remove-cover-btn').addEventListener('click', removeCoverPhoto);
+document.getElementById('delete-account-modal-btn').addEventListener('click', () => {
+    closeModal();
+    deleteAccount();
+});
+
+document.getElementById('photo-upload').addEventListener('change', async (e) => {
+    if (e.target.files[0]) {
+        await uploadProfilePicture(e.target.files[0]);
+        document.getElementById('photo-upload').value = '';
+    }
+});
+
+document.getElementById('cover-upload').addEventListener('change', async (e) => {
+    if (e.target.files[0]) {
+        await uploadCoverPhoto(e.target.files[0]);
+        document.getElementById('cover-upload').value = '';
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('edit-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('edit-modal')) {
+        closeModal();
+    }
+});
+
+// Initialize
+async function init() {
+    console.log('Initializing profile page...');
+    const user = await checkAuth();
+    if (user) {
+        console.log('User authenticated:', user);
+        await loadProfile();
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('profile-content').style.display = 'block';
+    }
+}
+
+init();
+</script>
+</body>
+</html>

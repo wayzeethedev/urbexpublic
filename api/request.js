@@ -1,28 +1,27 @@
-// Vercel serverless function — POST /api/request
-// Saves invite requests to MongoDB.
-//
-// Required environment variable (set in Vercel project settings):
-//   MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
-
 import { MongoClient } from 'mongodb';
 
-const uri    = process.env.MONGODB_URI;
-const DB     = 'vestige';
-const COL    = 'invite_requests';
+const uri = process.env.MONGODB_URI;
+const DB = 'vestige';
+const COL = 'invite_requests';
 
-// Reuse client across warm invocations
 let cachedClient = null;
 
 async function getClient() {
   if (cachedClient) return cachedClient;
+  if (!uri) throw new Error('MONGODB_URI is not defined');
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
   return client;
 }
 
+// Generate random 12-digit access token
+function generateAccessToken() {
+  return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+}
+
 export default async function handler(req, res) {
-  // Set CORS headers for local development
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -39,9 +38,14 @@ export default async function handler(req, res) {
 
   const { name, email, comments } = req.body ?? {};
 
+  // Parse name into first and last
+  const nameParts = name.trim().split(' ');
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(' ') || '';
+
   // Server-side validation
-  if (!name || typeof name !== 'string' || name.trim().length === 0) {
-    return res.status(400).json({ error: 'Name is required.' });
+  if (!firstName || typeof firstName !== 'string' || firstName.trim().length === 0) {
+    return res.status(400).json({ error: 'First name is required.' });
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'A valid email address is required.' });
@@ -54,7 +58,7 @@ export default async function handler(req, res) {
 
   try {
     const client = await getClient();
-    const col    = client.db(DB).collection(COL);
+    const col = client.db(DB).collection(COL);
 
     // Prevent duplicate requests from the same email
     const existing = await col.findOne({ email: email.toLowerCase().trim() });
@@ -62,15 +66,33 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: 'A request from this email already exists.' });
     }
 
+    // Generate unique access token (ensure it's not already used)
+    let accessToken;
+    let isUnique = false;
+    
+    while (!isUnique) {
+      accessToken = generateAccessToken();
+      const existingToken = await col.findOne({ accessToken: accessToken });
+      if (!existingToken) {
+        isUnique = true;
+      }
+    }
+
     await col.insertOne({
-      name:      name.trim(),
-      email:     email.toLowerCase().trim(),
-      comments:  comments?.trim() ?? '',
-      status:    'pending',   // pending | approved | denied
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.toLowerCase().trim(),
+      comments: comments?.trim() ?? '',
+      status: 'pending',
+      accessToken: accessToken, // Token assigned immediately
       createdAt: new Date(),
     });
 
-    return res.status(200).json({ ok: true, message: 'Request submitted successfully' });
+    return res.status(200).json({ 
+      ok: true, 
+      message: 'Request submitted successfully. You will be notified when approved.',
+      // Don't return the token to the user - you'll send it manually when approved
+    });
 
   } catch (err) {
     console.error('MongoDB error:', err);
