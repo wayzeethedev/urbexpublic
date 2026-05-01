@@ -19,7 +19,6 @@ body {
     padding-bottom: 70px;
 }
 
-/* Header/Banner */
 .header {
     width: 100%;
     height: 200px;
@@ -27,9 +26,9 @@ body {
     background-position: center;
     position: relative;
     background-color: #333;
+    background-image: url('https://www.eventx.om/uploads/default-speaker-cover.jpg');
 }
 
-/* Profile Row */
 .profile-row {
     display: flex;
     align-items: flex-end;
@@ -77,11 +76,6 @@ body {
     margin-top: 8px;
 }
 
-.edit-profile-btn:hover {
-    opacity: 0.9;
-}
-
-/* Description */
 .description {
     margin-top: 20px;
     padding: 0 20px;
@@ -94,7 +88,6 @@ body {
     margin: 0;
 }
 
-/* Stats Box */
 .statbox {
     display: flex;
     gap: 30px;
@@ -129,7 +122,6 @@ body {
     display: inline-block;
 }
 
-/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -176,7 +168,6 @@ body {
     background: #fafafa;
     font-size: 14px;
     outline: none;
-    transition: all 0.2s;
 }
 
 .edit-field input:focus,
@@ -251,14 +242,6 @@ body {
     font-size: 14px;
 }
 
-.save-btn:hover {
-    opacity: 0.9;
-}
-
-.cancel-btn:hover {
-    background: #e5e5e5;
-}
-
 .danger-zone {
     border-top: 2px solid #ffe9e9;
     margin-top: 20px;
@@ -286,7 +269,6 @@ body {
     background: #ffe9e9;
 }
 
-/* Bottom Navigation */
 .navbar {
     position: fixed;
     bottom: 0;
@@ -309,7 +291,6 @@ body {
     font-size: 12px;
     color: #777;
     text-decoration: none;
-    transition: color 0.2s;
 }
 
 .nav-item i {
@@ -321,11 +302,6 @@ body {
     color: #ff3b3b;
 }
 
-.nav-item:hover {
-    color: #111;
-}
-
-/* Toast */
 .toast {
     position: fixed;
     bottom: 80px;
@@ -370,10 +346,6 @@ body {
     to { transform: rotate(360deg); }
 }
 
-.hidden {
-    display: none;
-}
-
 #photo-upload, #cover-upload {
     display: none;
 }
@@ -388,10 +360,8 @@ body {
 </div>
 
 <div id="profile-content" style="display:none;">
-    <!-- Banner -->
     <div class="header" id="banner"></div>
 
-    <!-- Profile Row -->
     <div class="profile-row">
         <img class="pfp" id="profile-pic" src="https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" alt="profile picture">
         <div class="username-section">
@@ -403,12 +373,10 @@ body {
         </div>
     </div>
 
-    <!-- Description -->
     <div class="description">
         <p id="user-bio"></p>
     </div>
 
-    <!-- Stats -->
     <div class="statbox">
         <div class="stat-item">
             <h3 class="stat-number" id="locations-unlocked">0/100</h3>
@@ -429,7 +397,6 @@ body {
     </div>
 </div>
 
-<!-- Edit Profile Modal -->
 <div id="edit-modal" class="modal">
     <div class="modal-content">
         <h3>Edit Profile</h3>
@@ -480,10 +447,9 @@ body {
     </div>
 </div>
 
-<input type="file" id="photo-upload" accept="image/*">
-<input type="file" id="cover-upload" accept="image/*">
+<input type="file" id="photo-upload" accept="image/jpeg,image/png,image/jpg">
+<input type="file" id="cover-upload" accept="image/jpeg,image/png,image/jpg">
 
-<!-- Bottom Navigation -->
 <div class="navbar">
     <a href="/map.html" class="nav-item">
         <i class="fa-solid fa-map"></i>
@@ -499,32 +465,22 @@ body {
 let currentUser = null;
 let currentProfile = null;
 
-// Check authentication via cookie
 async function checkAuth() {
     try {
-        console.log('Checking authentication...');
         const response = await fetch('/api/check-auth', {
             method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            credentials: 'include'
         });
-        
-        console.log('Auth response status:', response.status);
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Auth data:', data);
             if (data.authenticated && data.user) {
                 currentUser = data.user;
                 return currentUser;
-            } else {
-                throw new Error('Not authenticated');
             }
-        } else {
-            throw new Error('Auth failed');
         }
+        window.location.href = '/login.html';
+        return null;
     } catch (error) {
         console.error('Auth error:', error);
         window.location.href = '/login.html';
@@ -532,44 +488,27 @@ async function checkAuth() {
     }
 }
 
-// Load profile for current logged in user
 async function loadProfile() {
-    if (!currentUser || !currentUser.username) {
-        console.error('No current user or username:', currentUser);
-        return;
-    }
-    
-    console.log('Loading profile for username:', currentUser.username);
+    if (!currentUser?.username) return;
     
     try {
         const response = await fetch(`/api/profile/${currentUser.username}`, {
             method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            credentials: 'include'
         });
-        
-        console.log('Profile response status:', response.status);
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Profile data:', data);
             currentProfile = data;
             displayProfile(data);
         } else {
-            console.error('Failed to load profile, status:', response.status);
-            // Create default profile from user data
             const defaultProfile = {
                 username: currentUser.username,
-                displayName: currentUser.displayName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim(),
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
+                displayName: `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.username,
                 bio: 'No bio yet. Click edit to add one!',
                 locationsUnlocked: 0,
                 locationsExplored: 0,
                 points: 0,
-                totalLocations: 100,
                 profilePic: null,
                 coverPhoto: null
             };
@@ -582,46 +521,35 @@ async function loadProfile() {
 }
 
 function displayProfile(profile) {
-    console.log('Displaying profile:', profile);
-    
-    // Set display name - use username as fallback
     const displayName = profile.displayName || profile.username;
     document.getElementById('display-name').textContent = displayName;
     document.getElementById('user-handle').textContent = `@${profile.username}`;
     document.getElementById('user-bio').textContent = profile.bio || 'No bio yet. Click edit to add one!';
-    
-    // Set stats (placeholder values for now)
     document.getElementById('locations-unlocked').textContent = `0/100`;
     document.getElementById('locations-explored').textContent = '0';
     document.getElementById('points').textContent = '0';
     document.getElementById('rank').textContent = 'Novice';
     
-    // Set profile picture - use default if none
-    if (profile.profilePic) {
+    if (profile.profilePic && profile.profilePic !== 'null') {
         document.getElementById('profile-pic').src = profile.profilePic;
-    } else {
-        document.getElementById('profile-pic').src = 'https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg';
     }
     
-    // Set cover photo - use default if none
-    if (profile.coverPhoto) {
+    if (profile.coverPhoto && profile.coverPhoto !== 'null') {
         document.getElementById('banner').style.backgroundImage = `url(${profile.coverPhoto})`;
-    } else {
-        document.getElementById('banner').style.backgroundImage = 'url("https://www.eventx.om/uploads/default-speaker-cover.jpg")';
     }
     
-    // Fill edit form
     document.getElementById('edit-display-name').value = profile.displayName || '';
     document.getElementById('edit-bio').value = profile.bio || '';
 }
 
-// Upload profile picture
-async function uploadProfilePicture(file) {
+async function uploadImage(file, type) {
     const formData = new FormData();
     formData.append('photo', file);
     
+    const endpoint = type === 'profile' ? '/api/profile/upload-photo' : '/api/profile/upload-cover';
+    
     try {
-        const response = await fetch('/api/profile/upload-photo', {
+        const response = await fetch(endpoint, {
             method: 'POST',
             credentials: 'include',
             body: formData
@@ -629,64 +557,45 @@ async function uploadProfilePicture(file) {
         
         if (response.ok) {
             const data = await response.json();
-            document.getElementById('profile-pic').src = data.photoUrl;
-            if (currentProfile) currentProfile.profilePic = data.photoUrl;
-            showToast('Profile picture updated!');
-            return data.photoUrl;
-        } else {
-            showToast('Failed to upload photo', 'error');
-            return null;
+            if (type === 'profile') {
+                document.getElementById('profile-pic').src = data.photoUrl;
+                if (currentProfile) currentProfile.profilePic = data.photoUrl;
+            } else {
+                document.getElementById('banner').style.backgroundImage = `url(${data.photoUrl})`;
+                if (currentProfile) currentProfile.coverPhoto = data.photoUrl;
+            }
+            showToast(`${type === 'profile' ? 'Profile picture' : 'Cover photo'} updated!`);
+            return true;
         }
+        showToast(`Failed to upload ${type} photo`, 'error');
+        return false;
     } catch (error) {
         console.error('Upload error:', error);
         showToast('Network error', 'error');
-        return null;
+        return false;
     }
 }
 
-// Upload cover photo
-async function uploadCoverPhoto(file) {
-    const formData = new FormData();
-    formData.append('photo', file);
+async function removeImage(type) {
+    const endpoint = type === 'profile' ? '/api/profile/remove-photo' : '/api/profile/remove-cover';
     
     try {
-        const response = await fetch('/api/profile/upload-cover', {
-            method: 'POST',
-            credentials: 'include',
-            body: formData
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            document.getElementById('banner').style.backgroundImage = `url(${data.photoUrl})`;
-            if (currentProfile) currentProfile.coverPhoto = data.photoUrl;
-            showToast('Cover photo updated!');
-            return data.photoUrl;
-        } else {
-            showToast('Failed to upload cover', 'error');
-            return null;
-        }
-    } catch (error) {
-        console.error('Upload error:', error);
-        showToast('Network error', 'error');
-        return null;
-    }
-}
-
-// Remove profile picture (set to default)
-async function removeProfilePicture() {
-    try {
-        const response = await fetch('/api/profile/remove-photo', {
+        const response = await fetch(endpoint, {
             method: 'POST',
             credentials: 'include'
         });
         
         if (response.ok) {
-            document.getElementById('profile-pic').src = 'https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg';
-            if (currentProfile) currentProfile.profilePic = null;
-            showToast('Profile picture removed');
+            if (type === 'profile') {
+                document.getElementById('profile-pic').src = 'https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg';
+                if (currentProfile) currentProfile.profilePic = null;
+            } else {
+                document.getElementById('banner').style.backgroundImage = 'url("https://www.eventx.om/uploads/default-speaker-cover.jpg")';
+                if (currentProfile) currentProfile.coverPhoto = null;
+            }
+            showToast(`${type === 'profile' ? 'Profile picture' : 'Cover photo'} removed`);
         } else {
-            showToast('Failed to remove photo', 'error');
+            showToast(`Failed to remove ${type} photo`, 'error');
         }
     } catch (error) {
         console.error('Remove error:', error);
@@ -694,28 +603,6 @@ async function removeProfilePicture() {
     }
 }
 
-// Remove cover photo (set to default)
-async function removeCoverPhoto() {
-    try {
-        const response = await fetch('/api/profile/remove-cover', {
-            method: 'POST',
-            credentials: 'include'
-        });
-        
-        if (response.ok) {
-            document.getElementById('banner').style.backgroundImage = 'url("https://www.eventx.om/uploads/default-speaker-cover.jpg")';
-            if (currentProfile) currentProfile.coverPhoto = null;
-            showToast('Cover photo removed');
-        } else {
-            showToast('Failed to remove cover', 'error');
-        }
-    } catch (error) {
-        console.error('Remove error:', error);
-        showToast('Network error', 'error');
-    }
-}
-
-// Save profile settings
 async function saveProfileSettings() {
     const settings = {
         displayName: document.getElementById('edit-display-name').value,
@@ -732,13 +619,11 @@ async function saveProfileSettings() {
         
         if (response.ok) {
             showToast('Profile updated!');
-            // Update display
             if (currentProfile) {
                 currentProfile.displayName = settings.displayName;
                 currentProfile.bio = settings.bio;
             }
-            const displayName = settings.displayName || currentUser.username;
-            document.getElementById('display-name').textContent = displayName;
+            document.getElementById('display-name').textContent = settings.displayName || currentUser.username;
             document.getElementById('user-bio').textContent = settings.bio || 'No bio yet. Click edit to add one!';
             closeModal();
         } else {
@@ -750,28 +635,14 @@ async function saveProfileSettings() {
     }
 }
 
-// Delete account
 async function deleteAccount() {
-    if (confirm('⚠️ Are you sure? This will permanently delete your account and all data. This cannot be undone.')) {
-        const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+    if (confirm('⚠️ Are you sure? This will permanently delete your account and all data.')) {
+        const confirmation = prompt('Type "DELETE" to confirm:');
         if (confirmation === 'DELETE') {
-            try {
-                const response = await fetch('/api/profile/delete', {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    showToast('Account deleted');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                } else {
-                    showToast('Failed to delete account', 'error');
-                }
-            } catch (error) {
-                console.error('Delete error:', error);
-                showToast('Network error', 'error');
+            const response = await fetch('/api/profile/delete', { method: 'DELETE', credentials: 'include' });
+            if (response.ok) {
+                showToast('Account deleted');
+                setTimeout(() => window.location.href = '/', 2000);
             }
         }
     }
@@ -785,7 +656,6 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 3000);
 }
 
-// Modal functions
 function openModal() {
     document.getElementById('edit-modal').style.display = 'flex';
 }
@@ -807,8 +677,8 @@ document.getElementById('change-cover-btn').addEventListener('click', () => {
     document.getElementById('cover-upload').click();
 });
 
-document.getElementById('remove-photo-btn').addEventListener('click', removeProfilePicture);
-document.getElementById('remove-cover-btn').addEventListener('click', removeCoverPhoto);
+document.getElementById('remove-photo-btn').addEventListener('click', () => removeImage('profile'));
+document.getElementById('remove-cover-btn').addEventListener('click', () => removeImage('cover'));
 document.getElementById('delete-account-modal-btn').addEventListener('click', () => {
     closeModal();
     deleteAccount();
@@ -816,31 +686,25 @@ document.getElementById('delete-account-modal-btn').addEventListener('click', ()
 
 document.getElementById('photo-upload').addEventListener('change', async (e) => {
     if (e.target.files[0]) {
-        await uploadProfilePicture(e.target.files[0]);
+        await uploadImage(e.target.files[0], 'profile');
         document.getElementById('photo-upload').value = '';
     }
 });
 
 document.getElementById('cover-upload').addEventListener('change', async (e) => {
     if (e.target.files[0]) {
-        await uploadCoverPhoto(e.target.files[0]);
+        await uploadImage(e.target.files[0], 'cover');
         document.getElementById('cover-upload').value = '';
     }
 });
 
-// Close modal when clicking outside
 document.getElementById('edit-modal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('edit-modal')) {
-        closeModal();
-    }
+    if (e.target === document.getElementById('edit-modal')) closeModal();
 });
 
-// Initialize
 async function init() {
-    console.log('Initializing profile page...');
     const user = await checkAuth();
     if (user) {
-        console.log('User authenticated:', user);
         await loadProfile();
         document.getElementById('loading').style.display = 'none';
         document.getElementById('profile-content').style.display = 'block';

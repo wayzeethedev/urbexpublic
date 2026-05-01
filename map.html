@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Vestige Map</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet Rotate plugin for map rotation -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-rotate/dist/leaflet.rotate.css" />
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background: #f5f5f5;
+    }
+
+    #map {
+        width: 100%;
+        height: calc(100vh - 70px);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Floating Add Location Button */
+    .add-location-btn {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #ff3b3b;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: all 0.2s ease;
+        font-size: 24px;
+    }
+
+    .add-location-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Current Location Button */
+    .locate-btn {
+        position: fixed;
+        bottom: 90px;
+        left: 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: white;
+        color: #333;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: all 0.2s ease;
+        font-size: 20px;
+    }
+
+    .locate-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* North Button - Only appears when rotated */
+    .north-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: white;
+        color: #333;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: all 0.2s ease;
+        font-size: 18px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .north-btn:active {
+        transform: scale(0.95);
+    }
+
+    .north-btn.show {
+        display: flex;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-decoration: none;
+        color: #8e8e93;
+        font-size: 10px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px 0;
+    }
+
+    .nav-item i {
+        font-size: 24px;
+    }
+
+    .nav-item.active {
+        color: #ff3b3b;
+    }
+
+    /* Safe area for notched phones */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(70px + env(safe-area-inset-bottom));
+        }
+        #map {
+            height: calc(100vh - (70px + env(safe-area-inset-bottom)));
+        }
+        .add-location-btn {
+            bottom: calc(90px + env(safe-area-inset-bottom));
+        }
+        .locate-btn {
+            bottom: calc(90px + env(safe-area-inset-bottom));
+        }
+        .north-btn {
+            top: calc(20px + env(safe-area-inset-top));
+        }
+    }
+
+    /* Toast notification */
+    .toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1c1c1e;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 14px;
+        z-index: 1100;
+        white-space: nowrap;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    /* Custom zoom controls - clean look */
+    .leaflet-control-zoom {
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: 0 !important;
+    }
+
+    .leaflet-control-zoom a {
+        background: white !important;
+        color: #333 !important;
+        width: 40px !important;
+        height: 40px !important;
+        line-height: 40px !important;
+        font-size: 18px !important;
+        border: none !important;
+    }
+
+    .leaflet-control-zoom a:hover {
+        background: #f5f5f5 !important;
+    }
+
+    /* Hide attribution and scale */
+    .leaflet-control-attribution {
+        display: none !important;
+    }
+
+    .leaflet-control-scale {
+        display: none !important;
+    }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<button class="add-location-btn" id="addLocationBtn">
+    <i class="fas fa-plus"></i>
+</button>
+
+<button class="locate-btn" id="locateBtn">
+    <i class="fas fa-location-arrow"></i>
+</button>
+
+<button class="north-btn" id="northBtn">
+    <i class="fas fa-compass"></i>
+</button>
+
+<div class="bottom-nav">
+    <a href="/map.html" class="nav-item active">
+        <i class="fas fa-map"></i>
+        <span>Map</span>
+    </a>
+    <a href="/profile.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+    </a>
+</div>
+
+<div id="toast" class="toast">📍 Getting your location...</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-rotate/dist/leaflet.rotate.js"></script>
+
+<script>
+    (function() {
+        // Initialize map with rotation enabled
+        const map = L.map('map', {
+            rotate: true,
+            rotateControl: false,
+            touchRotate: true,
+            trackResize: true
+        }).setView([44.8614, -92.6238], 13, 0);
+
+        // CartoDB Positron tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20,
+            minZoom: 1,
+            attribution: ''
+        }).addTo(map);
+
+        let userLocationMarker = null;
+        let userLocationCircle = null;
+        let watchId = null;
+        let currentHeading = 0;
+
+        // Create custom blue dot icon with direction indicator
+        function getBlueDotIcon(heading = 0) {
+            return L.divIcon({
+                className: 'custom-blue-dot',
+                html: `<div style="position: relative;">
+                            <div style="background: #007aff; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px rgba(0,122,255,0.3);"></div>
+                            <div style="position: absolute; top: -12px; left: 5px; width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent; border-bottom: 8px solid #007aff; transform: rotate(${heading}deg);"></div>
+                        </div>`,
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+        }
+
+        const blueDotIcon = L.divIcon({
+            className: 'custom-blue-dot',
+            html: '<div style="background: #007aff; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px rgba(0,122,255,0.3);"></div>',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+        });
+
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Check map rotation and show/hide north button
+        function updateNorthButton() {
+            const rotation = map.getBearing();
+            const northBtn = document.getElementById('northBtn');
+            if (Math.abs(rotation) > 1) {
+                northBtn.classList.add('show');
+            } else {
+                northBtn.classList.remove('show');
+            }
+        }
+
+        // Reset map rotation to north
+        function resetNorth() {
+            map.setBearing(0);
+            updateNorthButton();
+            showToast('⬆️ North', 1000);
+        }
+
+        // Get user's current location
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                showToast('❌ Location not supported', 2000);
+                return;
+            }
+
+            showToast('📍 Getting your location...', 1500);
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy, heading } = position.coords;
+                    const userLatLng = [latitude, longitude];
+                    currentHeading = heading || 0;
+
+                    if (userLocationMarker) {
+                        map.removeLayer(userLocationMarker);
+                    }
+                    if (userLocationCircle) {
+                        map.removeLayer(userLocationCircle);
+                    }
+
+                    userLocationMarker = L.marker(userLatLng, {
+                        icon: heading ? getBlueDotIcon(heading) : blueDotIcon,
+                        zIndexOffset: 1000
+                    }).addTo(map);
+
+                    userLocationCircle = L.circle(userLatLng, {
+                        radius: accuracy,
+                        color: '#007aff',
+                        weight: 1,
+                        fillColor: '#007aff',
+                        fillOpacity: 0.1
+                    }).addTo(map);
+
+                    map.flyTo(userLatLng, 15, {
+                        duration: 1,
+                        animate: true
+                    });
+
+                    showToast('📍 You are here', 1500);
+                },
+                (error) => {
+                    console.error('Location error:', error);
+                    let errorMessage = '📍 Could not get location';
+                    if (error.code === 1) errorMessage = '📍 Permission denied';
+                    if (error.code === 2) errorMessage = '📍 Location unavailable';
+                    showToast(errorMessage, 2000);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Start watching user location
+        function startWatchingLocation() {
+            if (!navigator.geolocation) return;
+
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy, heading } = position.coords;
+                    const userLatLng = [latitude, longitude];
+                    currentHeading = heading || 0;
+
+                    if (userLocationMarker) {
+                        userLocationMarker.setLatLng(userLatLng);
+                        if (heading) {
+                            userLocationMarker.setIcon(getBlueDotIcon(heading));
+                        }
+                    } else {
+                        userLocationMarker = L.marker(userLatLng, {
+                            icon: heading ? getBlueDotIcon(heading) : blueDotIcon,
+                            zIndexOffset: 1000
+                        }).addTo(map);
+                    }
+
+                    if (userLocationCircle) {
+                        userLocationCircle.setLatLng(userLatLng);
+                        userLocationCircle.setRadius(accuracy);
+                    } else {
+                        userLocationCircle = L.circle(userLatLng, {
+                            radius: accuracy,
+                            color: '#007aff',
+                            weight: 1,
+                            fillColor: '#007aff',
+                            fillOpacity: 0.1
+                        }).addTo(map);
+                    }
+                },
+                (error) => {
+                    console.error('Watch location error:', error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 5000
+                }
+            );
+        }
+
+        // Event listeners
+        document.getElementById('locateBtn').addEventListener('click', () => {
+            getCurrentLocation();
+        });
+
+        document.getElementById('addLocationBtn').addEventListener('click', () => {
+            window.location.href = '/upload.html';
+        });
+
+        document.getElementById('northBtn').addEventListener('click', () => {
+            resetNorth();
+        });
+
+        // Listen for map rotation events
+        map.on('rotate', updateNorthButton);
+
+        // Set active nav state
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPath || (currentPath === '/map.html' && href === '/map.html')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Handle map resize on orientation change
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
+        });
+
+        setActiveNav();
+        
+        console.log('Map ready with rotation enabled');
+    })();
+</script>
+</body>
+</html>

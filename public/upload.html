@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Upload Location - Vestige</title>
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        background: #f5f5f5;
+        padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+        background: white;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e5e5e5;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .back-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        padding: 5px;
+    }
+
+    .back-btn:hover {
+        color: #111;
+    }
+
+    /* Main Content */
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        font-size: 14px;
+        font-family: inherit;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #ff3b3b;
+        box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Image Upload */
+    .image-upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #fafafa;
+    }
+
+    .image-upload-area:hover {
+        border-color: #ff3b3b;
+        background: #fff;
+    }
+
+    .image-upload-area i {
+        font-size: 40px;
+        color: #999;
+        margin-bottom: 10px;
+    }
+
+    .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .image-preview {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    .remove-image:hover {
+        background: rgba(0,0,0,0.8);
+    }
+
+    /* Level Select */
+    .level-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .level-option {
+        background: white;
+        border: 2px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .level-option.selected {
+        border-color: #ff3b3b;
+        background: #fff5f5;
+    }
+
+    .level-option img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        margin-bottom: 8px;
+    }
+
+    .level-option span {
+        font-size: 12px;
+        font-weight: 500;
+        display: block;
+    }
+
+    /* Tags */
+    .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .tag-chip {
+        background: white;
+        border: 2px solid #e5e5e5;
+        border-radius: 30px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tag-chip.selected {
+        border-color: #ff3b3b;
+        background: #fff5f5;
+    }
+
+    .tag-chip img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    .tag-chip span {
+        font-size: 13px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: #ff3b3b;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        opacity: 0.9;
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #5e6873;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px 0;
+        border-radius: 40px;
+    }
+
+    .nav-item i {
+        font-size: 1.6rem;
+    }
+
+    .nav-item.active {
+        color: #ff3b3b;
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        z-index: 1100;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    #image-input {
+        display: none;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>
+        <button class="back-btn" onclick="history.back()">←</button>
+        Upload Location
+    </h1>
+</div>
+
+<div class="container">
+    <form id="upload-form">
+        <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="title" placeholder="Enter location title" required>
+        </div>
+
+        <div class="form-group">
+            <label>Description *</label>
+            <textarea id="description" placeholder="Describe this location..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Photos (up to 9)</label>
+            <div class="image-upload-area" id="image-upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click or drag to upload photos</p>
+                <p style="font-size: 12px; color: #999;">Up to 9 images, JPG or PNG</p>
+            </div>
+            <div class="image-preview-grid" id="image-preview-grid"></div>
+            <input type="file" id="image-input" multiple accept="image/jpeg,image/png,image/jpg">
+        </div>
+
+        <div class="form-group">
+            <label>Difficulty Level *</label>
+            <div class="level-options" id="level-options"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-container" id="tags-container"></div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Publish Location</button>
+    </form>
+</div>
+
+<div class="bottom-nav">
+    <a href="/map.html" class="nav-item">
+        <i class="fas fa-map"></i>
+        <span>Map</span>
+    </a>
+    <a href="/upload.html" class="nav-item active">
+        <i class="fas fa-plus-circle"></i>
+        <span>Upload</span>
+    </a>
+    <a href="/profile.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+    </a>
+</div>
+
+<script>
+let selectedFiles = [];
+let selectedLevel = null;
+let selectedTags = [];
+let levelsData = [];
+let tagsData = [];
+
+// Load levels from JSON
+async function loadLevels() {
+    try {
+        const response = await fetch('/assets/json/levels.json');
+        levelsData = await response.json();
+        displayLevels();
+    } catch (error) {
+        console.error('Error loading levels:', error);
+        // Fallback default levels
+        levelsData = [
+            { name: 'Beginner', icon: '/assets/icons/beginner.png', value: 'beginner' },
+            { name: 'Intermediate', icon: '/assets/icons/intermediate.png', value: 'intermediate' },
+            { name: 'Advanced', icon: '/assets/icons/advanced.png', value: 'advanced' },
+            { name: 'Expert', icon: '/assets/icons/expert.png', value: 'expert' }
+        ];
+        displayLevels();
+    }
+}
+
+function displayLevels() {
+    const container = document.getElementById('level-options');
+    container.innerHTML = '';
+    levelsData.forEach(level => {
+        const div = document.createElement('div');
+        div.className = 'level-option';
+        div.dataset.value = level.value;
+        div.innerHTML = `
+            <img src="${level.icon}" alt="${level.name}" onerror="this.src='/assets/images/default-icon.png'">
+            <span>${level.name}</span>
+        `;
+        div.addEventListener('click', () => {
+            document.querySelectorAll('.level-option').forEach(opt => opt.classList.remove('selected'));
+            div.classList.add('selected');
+            selectedLevel = level;
+        });
+        container.appendChild(div);
+    });
+}
+
+// Load tags from JSON
+async function loadTags() {
+    try {
+        const response = await fetch('/assets/json/tags.json');
+        tagsData = await response.json();
+        displayTags();
+    } catch (error) {
+        console.error('Error loading tags:', error);
+        // Fallback default tags
+        tagsData = [
+            { name: 'Abandoned', icon: '/assets/icons/abandoned.png', value: 'abandoned' },
+            { name: 'Nature', icon: '/assets/icons/nature.png', value: 'nature' },
+            { name: 'Urban', icon: '/assets/icons/urban.png', value: 'urban' },
+            { name: 'Historical', icon: '/assets/icons/historical.png', value: 'historical' }
+        ];
+        displayTags();
+    }
+}
+
+function displayTags() {
+    const container = document.getElementById('tags-container');
+    container.innerHTML = '';
+    tagsData.forEach(tag => {
+        const chip = document.createElement('div');
+        chip.className = 'tag-chip';
+        chip.dataset.value = tag.value;
+        chip.innerHTML = `
+            <img src="${tag.icon}" alt="${tag.name}" onerror="this.src='/assets/images/default-icon.png'">
+            <span>${tag.name}</span>
+        `;
+        chip.addEventListener('click', () => {
+            if (selectedTags.includes(tag)) {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                chip.classList.remove('selected');
+            } else {
+                selectedTags.push(tag);
+                chip.classList.add('selected');
+            }
+        });
+        container.appendChild(chip);
+    });
+}
+
+// Image upload handling
+const imageUploadArea = document.getElementById('image-upload-area');
+const imageInput = document.getElementById('image-input');
+const imagePreviewGrid = document.getElementById('image-preview-grid');
+
+imageUploadArea.addEventListener('click', () => {
+    imageInput.click();
+});
+
+imageUploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    imageUploadArea.style.borderColor = '#ff3b3b';
+});
+
+imageUploadArea.addEventListener('dragleave', () => {
+    imageUploadArea.style.borderColor = '#ddd';
+});
+
+imageUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    imageUploadArea.style.borderColor = '#ddd';
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+});
+
+imageInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+});
+
+function handleFiles(files) {
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    const totalFiles = selectedFiles.length + imageFiles.length;
+    
+    if (totalFiles > 9) {
+        showToast('Maximum 9 images allowed');
+        return;
+    }
+    
+    imageFiles.forEach(file => {
+        selectedFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview';
+            previewDiv.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button class="remove-image" onclick="removeImage(${selectedFiles.indexOf(file)})">×</button>
+            `;
+            imagePreviewGrid.appendChild(previewDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    imageInput.value = '';
+}
+
+function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    refreshImagePreview();
+}
+
+function refreshImagePreview() {
+    imagePreviewGrid.innerHTML = '';
+    selectedFiles.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview';
+            previewDiv.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button class="remove-image" onclick="removeImage(${idx})">×</button>
+            `;
+            imagePreviewGrid.appendChild(previewDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Upload images to Cloudinary
+async function uploadImages() {
+    const uploadedUrls = [];
+    
+    for (const file of selectedFiles) {
+        const formData = new FormData();
+        formData.append('photo', file);
+        
+        try {
+            const response = await fetch('/api/locations/upload-image', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                uploadedUrls.push(data.photoUrl);
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            console.error('Image upload error:', error);
+            showToast(`Failed to upload ${file.name}`);
+            return null;
+        }
+    }
+    
+    return uploadedUrls;
+}
+
+// Submit location
+async function submitLocation(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    
+    if (!title) {
+        showToast('Please enter a title');
+        return;
+    }
+    
+    if (!description) {
+        showToast('Please enter a description');
+        return;
+    }
+    
+    if (!selectedLevel) {
+        showToast('Please select a difficulty level');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading...';
+    
+    // Upload images first
+    const imageUrls = await uploadImages();
+    if (imageUrls === null && selectedFiles.length > 0) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Publish Location';
+        return;
+    }
+    
+    // Get current location from map (for now, use default)
+    // In a real implementation, you'd get this from the map or a location picker
+    const locationData = {
+        title,
+        description,
+        images: imageUrls || [],
+        level: selectedLevel,
+        tags: selectedTags.map(t => t.value),
+        coordinates: {
+            lat: 44.8614,
+            lng: -92.6238
+        }
+    };
+    
+    try {
+        const response = await fetch('/api/locations/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(locationData)
+        });
+        
+        if (response.ok) {
+            showToast('Location published successfully!');
+            setTimeout(() => {
+                window.location.href = '/map.html';
+            }, 1500);
+        } else {
+            const error = await response.json();
+            showToast(error.error || 'Failed to publish location');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publish Location';
+        }
+    } catch (error) {
+        console.error('Submit error:', error);
+        showToast('Network error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Publish Location';
+    }
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Initialize
+document.getElementById('upload-form').addEventListener('submit', submitLocation);
+loadLevels();
+loadTags();
+</script>
+</body>
+</html>

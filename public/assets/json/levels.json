@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Beginner",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "beginner",
+        "description": "Easy access, safe conditions"
+    },
+    {
+        "name": "Intermediate",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "intermediate",
+        "description": "Moderate difficulty, some risks"
+    },
+    {
+        "name": "Advanced",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "advanced",
+        "description": "Challenging, requires experience"
+    },
+    {
+        "name": "Expert",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "expert",
+        "description": "Extremely dangerous, experts only"
+    }
+]

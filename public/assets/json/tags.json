@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Abandoned",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "abandoned"
+    },
+    {
+        "name": "Nature",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "nature"
+    },
+    {
+        "name": "Urban",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "urban"
+    },
+    {
+        "name": "Historical",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "historical"
+    },
+    {
+        "name": "Industrial",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "industrial"
+    },
+    {
+        "name": "Hospital",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "hospital"
+    },
+    {
+        "name": "School",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "school"
+    },
+    {
+        "name": "Church",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "church"
+    },
+    {
+        "name": "Cave",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "cave"
+    },
+    {
+        "name": "Waterfall",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "waterfall"
+    }
+]
