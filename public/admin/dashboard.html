@@ -21,14 +21,98 @@
         padding: 20px;
     }
 
-    .container {
-        max-width: 1200px;
+    .dashboard-container {
+        display: flex;
+        max-width: 1400px;
         margin: 0 auto;
+        gap: 20px;
     }
 
-    h1 {
-        font-size: 28px;
+    .sidebar {
+        width: 250px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        background: #111;
+        color: white;
+        text-align: center;
+    }
+
+    .sidebar-header h2 {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .sidebar-nav {
+        padding: 10px 0;
+    }
+
+    .nav-tab {
+        width: 100%;
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+    }
+
+    .nav-tab i {
+        width: 20px;
+    }
+
+    .nav-tab:hover {
+        background: #f5f5f5;
+    }
+
+    .nav-tab.active {
+        background: #ff3b3b;
+        color: white;
+    }
+
+    .main-content {
+        flex: 1;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+        margin: 0;
     }
 
     .pending-count {
@@ -39,16 +123,52 @@
         font-size: 14px;
     }
 
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .search-bar select {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: white;
+    }
+
+    .search-bar button {
+        padding: 10px 20px;
+        background: #111;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
     .locations-grid {
         display: grid;
         gap: 20px;
     }
 
     .location-card {
-        background: white;
+        background: #f8f8f8;
         border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: opacity 0.2s;
+    }
+
+    .location-card.processing {
+        opacity: 0.6;
+        pointer-events: none;
     }
 
     .location-images {
@@ -147,6 +267,82 @@
         cursor: pointer;
     }
 
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    .data-table th {
+        background: #f8f8f8;
+        font-weight: 600;
+    }
+
+    .data-table tr {
+        transition: opacity 0.2s;
+    }
+
+    .data-table tr.processing {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .email-btn {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .delete-btn {
+        background: #b00020;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .edit-btn {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .gift-btn {
+        background: #15803d;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .accept-btn {
+        background: #15803d;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
     .loading {
         text-align: center;
         padding: 50px;
@@ -174,19 +370,222 @@
         padding: 50px;
         color: #666;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        width: 90%;
+        max-width: 450px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .checkbox-group input {
+        width: auto;
+    }
+
+    .bulk-actions {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .bulk-actions button {
+        padding: 8px 16px;
+        background: #15803d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .select-all {
+        margin-right: 10px;
+    }
 </style>
 </head>
-
 <body>
-<div class="container">
-    <h1>Admin Dashboard <span id="pending-count" class="pending-count">0</span></h1>
-    <div id="locations-container" class="locations-grid">
-        <div class="loading">Loading pending locations...</div>
+
+<div class="dashboard-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Admin Panel</h2>
+        </div>
+        <div class="sidebar-nav">
+            <button class="nav-tab active" data-tab="locations">
+                <i class="fas fa-map-marker-alt"></i> Locations
+            </button>
+            <button class="nav-tab" data-tab="invites">
+                <i class="fas fa-envelope"></i> Invited Users
+            </button>
+            <button class="nav-tab" data-tab="comments">
+                <i class="fas fa-comments"></i> Comments
+            </button>
+            <button class="nav-tab" data-tab="users">
+                <i class="fas fa-users"></i> Users
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="locations-tab" class="tab-content active">
+            <div class="page-header">
+                <h1>Pending Locations <span id="pending-count" class="pending-count">0</span></h1>
+            </div>
+            <div id="locations-container" class="locations-grid">
+                <div class="loading">Loading pending locations...</div>
+            </div>
+        </div>
+
+        <div id="invites-tab" class="tab-content">
+            <div class="page-header">
+                <h1>Invited Users</h1>
+            </div>
+            <div id="invites-container">
+                <div class="loading">Loading invites...</div>
+            </div>
+        </div>
+
+        <div id="comments-tab" class="tab-content">
+            <div class="page-header">
+                <h1>All Comments</h1>
+            </div>
+            <div id="comments-container">
+                <div class="loading">Loading comments...</div>
+            </div>
+        </div>
+
+        <div id="users-tab" class="tab-content">
+            <div class="page-header">
+                <h1>Users</h1>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="user-search" placeholder="Search by name, username, or email...">
+                <select id="search-field">
+                    <option value="all">All Fields</option>
+                    <option value="username">Username</option>
+                    <option value="email">Email</option>
+                    <option value="firstName">First Name</option>
+                    <option value="lastName">Last Name</option>
+                </select>
+                <button onclick="searchUsers()"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div id="users-container">
+                <div class="loading">Loading users...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit User</h2>
+            <button onclick="closeUserModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+        </div>
+        <form id="userEditForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="edit-username">
+            </div>
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="edit-firstName">
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="edit-lastName">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="edit-email">
+            </div>
+            <div class="form-group">
+                <label>Points</label>
+                <input type="number" id="edit-points">
+            </div>
+            <button type="submit" class="approve-btn" style="width:100%;">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<div id="giftModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Gift Locations</h2>
+            <button onclick="closeGiftModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+        </div>
+        <form id="giftForm">
+            <div class="form-group">
+                <label>Number of Locations to Gift</label>
+                <input type="number" id="gift-count" min="1" max="50" placeholder="Enter number (e.g., 5)">
+                <small style="color:#666; display:block; margin-top:5px;">Will automatically pick the nearest unowned locations to the user</small>
+            </div>
+            <button type="submit" class="approve-btn" style="width:100%;">Gift Locations</button>
+        </form>
     </div>
 </div>
 
 <script>
 let pendingLocations = [];
+let allUsers = [];
+let allInvites = [];
+let allComments = [];
+let allLocations = [];
+let currentEditUserId = null;
+let currentGiftUserId = null;
 
 async function checkAuth() {
     const response = await fetch('/api/check-auth', { credentials: 'include' });
@@ -197,20 +596,30 @@ async function checkAuth() {
     return response.json();
 }
 
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+        
+        if (tab.dataset.tab === 'invites') loadInvites();
+        if (tab.dataset.tab === 'comments') loadComments();
+        if (tab.dataset.tab === 'users') loadUsers();
+    });
+});
+
 async function loadPendingLocations() {
     try {
         const response = await fetch('/api/locations/pending', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
-            pendingLocations = data.locations;
+            pendingLocations = data.locations || [];
             document.getElementById('pending-count').textContent = pendingLocations.length;
             displayLocations();
-        } else {
-            showToast('Failed to load pending locations', 'error');
         }
     } catch (error) {
         console.error('Error loading locations:', error);
-        showToast('Network error', 'error');
     }
 }
 
@@ -223,7 +632,7 @@ function displayLocations() {
     }
     
     container.innerHTML = pendingLocations.map(loc => `
-        <div class="location-card" data-id="${loc._id}">
+        <div class="location-card" data-id="${loc._id}" id="location-${loc._id}">
             <div class="location-images">
                 ${loc.images && loc.images.length > 0 ? 
                     loc.images.map(img => `<img src="${img}" alt="Location image">`).join('') : 
@@ -239,10 +648,10 @@ function displayLocations() {
                 <div class="location-description">${escapeHtml(loc.description)}</div>
                 <div class="level">${loc.level.icon} ${loc.level.name}</div>
                 <div class="location-tags">
-                    ${loc.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    ${loc.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
                 </div>
                 <div class="approval-section">
-                    <input type="number" id="points-${loc._id}" class="points-input" placeholder="Points" min="2" max="20">
+                    <input type="number" id="points-${loc._id}" class="points-input" placeholder="Points" min="2" max="20" value="10">
                     <button class="approve-btn" onclick="approveLocation('${loc._id}')">Approve</button>
                     <button class="deny-btn" onclick="denyLocation('${loc._id}')">Deny</button>
                 </div>
@@ -260,6 +669,9 @@ async function approveLocation(locationId) {
         return;
     }
     
+    const card = document.getElementById(`location-${locationId}`);
+    card.classList.add('processing');
+    
     try {
         const response = await fetch('/api/locations/approve', {
             method: 'POST',
@@ -272,28 +684,29 @@ async function approveLocation(locationId) {
         
         if (response.ok) {
             showToast(data.message, 'success');
-            // Remove from list
             pendingLocations = pendingLocations.filter(l => l._id !== locationId);
             displayLocations();
             document.getElementById('pending-count').textContent = pendingLocations.length;
         } else {
+            card.classList.remove('processing');
             showToast(data.error, 'error');
         }
     } catch (error) {
-        console.error('Approve error:', error);
+        card.classList.remove('processing');
         showToast('Network error', 'error');
     }
 }
 
 async function denyLocation(locationId) {
-    const reason = prompt('Enter reason for denial (optional):');
+    const card = document.getElementById(`location-${locationId}`);
+    card.classList.add('processing');
     
     try {
         const response = await fetch('/api/locations/approve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ locationId, action: 'deny', deniedReason: reason || 'No reason provided' })
+            body: JSON.stringify({ locationId, action: 'deny' })
         });
         
         const data = await response.json();
@@ -304,12 +717,429 @@ async function denyLocation(locationId) {
             displayLocations();
             document.getElementById('pending-count').textContent = pendingLocations.length;
         } else {
+            card.classList.remove('processing');
             showToast(data.error, 'error');
         }
     } catch (error) {
-        console.error('Deny error:', error);
+        card.classList.remove('processing');
         showToast('Network error', 'error');
     }
+}
+
+async function loadInvites() {
+    try {
+        const response = await fetch('/api/admin/invites', { credentials: 'include' });
+        if (response.ok) {
+            const data = await response.json();
+            allInvites = data.invites || [];
+            displayInvites();
+        }
+    } catch (error) {
+        console.error('Error loading invites:', error);
+    }
+}
+
+function displayInvites() {
+    const container = document.getElementById('invites-container');
+    
+    if (allInvites.length === 0) {
+        container.innerHTML = '<div class="empty-state">No pending invites</div>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="data-table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Comments</th><th>Access Token</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                ${allInvites.map(invite => `
+                    <tr id="invite-${invite._id}">
+                        <td>${escapeHtml(invite.firstName)} ${escapeHtml(invite.lastName)}</td>
+                        <td>${escapeHtml(invite.email)}</td>
+                        <td>${escapeHtml(invite.comments || '')}</td>
+                        <td><code>${invite.accessToken || 'N/A'}</code></td>
+                        <td>
+                            <button class="email-btn" onclick="sendInviteEmail('${invite.email}', '${invite.accessToken}')"><i class="fas fa-envelope"></i> Email</button>
+                            <button class="accept-btn" onclick="acceptInvite('${invite._id}')">Accept</button>
+                            <button class="delete-btn" onclick="denyInvite('${invite._id}')">Deny</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function sendInviteEmail(email, token) {
+    const subject = encodeURIComponent('Your Vestige Invite');
+    const body = encodeURIComponent(`You've been invited to join Vestige!\n\nUse this link to register:\n${window.location.origin}/register.html?token=${token}\n\nThis token is unique to you. Do not share it.`);
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+async function acceptInvite(inviteId) {
+    const row = document.getElementById(`invite-${inviteId}`);
+    row.classList.add('processing');
+    
+    try {
+        const response = await fetch('/api/admin/accept-invite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ inviteId })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showToast('Invite accepted!', 'success');
+            allInvites = allInvites.filter(i => i._id !== inviteId);
+            displayInvites();
+        } else {
+            row.classList.remove('processing');
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        row.classList.remove('processing');
+        showToast('Network error', 'error');
+    }
+}
+
+async function denyInvite(inviteId) {
+    const row = document.getElementById(`invite-${inviteId}`);
+    row.classList.add('processing');
+    
+    try {
+        const response = await fetch('/api/admin/deny-invite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ inviteId })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showToast('Invite denied', 'success');
+            allInvites = allInvites.filter(i => i._id !== inviteId);
+            displayInvites();
+        } else {
+            row.classList.remove('processing');
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        row.classList.remove('processing');
+        showToast('Network error', 'error');
+    }
+}
+
+async function loadComments() {
+    try {
+        const response = await fetch('/api/admin/comments', { credentials: 'include' });
+        if (response.ok) {
+            const data = await response.json();
+            allComments = data.comments || [];
+            displayComments();
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+}
+
+function displayComments() {
+    const container = document.getElementById('comments-container');
+    
+    if (allComments.length === 0) {
+        container.innerHTML = '<div class="empty-state">No comments yet</div>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="data-table">
+            <thead>
+                <tr><th>User</th><th>Location</th><th>Comment</th><th>Date</th><th>Votes</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                ${allComments.map(comment => `
+                    <tr id="comment-${comment._id}">
+                        <td>${escapeHtml(comment.username)}</td>
+                        <td>${escapeHtml(comment.locationTitle || 'Unknown')}</td>
+                        <td>${escapeHtml(comment.text)}</td>
+                        <td>${new Date(comment.createdAt).toLocaleDateString()}</td>
+                        <td>↑${comment.upvotes || 0} ↓${comment.downvotes || 0}</td>
+                        <td><button class="delete-btn" onclick="deleteComment('${comment._id}')">Delete</button></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+async function deleteComment(commentId) {
+    const row = document.getElementById(`comment-${commentId}`);
+    row.classList.add('processing');
+    
+    try {
+        const response = await fetch('/api/admin/delete-comment', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ commentId })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showToast('Comment deleted', 'success');
+            allComments = allComments.filter(c => c._id !== commentId);
+            displayComments();
+        } else {
+            row.classList.remove('processing');
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        row.classList.remove('processing');
+        showToast('Network error', 'error');
+    }
+}
+
+async function loadUsers() {
+    try {
+        const [usersRes, locationsRes] = await Promise.all([
+            fetch('/api/admin/users', { credentials: 'include' }),
+            fetch('/api/locations/approved', { credentials: 'include' })
+        ]);
+        
+        if (usersRes.ok) {
+            const usersData = await usersRes.json();
+            allUsers = usersData.users || [];
+        }
+        
+        if (locationsRes.ok) {
+            const locationsData = await locationsRes.json();
+            allLocations = locationsData.locations || [];
+        }
+        
+        displayUsers(allUsers);
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3959;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function getNearestUnlockedLocations(user, count) {
+    if (!user.location || !allLocations.length) return [];
+    
+    const earnedIds = user.earnedLocationIds || [];
+    const availableLocations = allLocations.filter(loc => !earnedIds.includes(loc._id));
+    
+    const locationsWithDistance = availableLocations.map(loc => ({
+        ...loc,
+        distance: calculateDistance(user.location.lat, user.location.lng, loc.coordinates.lat, loc.coordinates.lng)
+    }));
+    
+    return locationsWithDistance.sort((a, b) => a.distance - b.distance).slice(0, count);
+}
+
+function displayUsers(users) {
+    const container = document.getElementById('users-container');
+    
+    if (users.length === 0) {
+        container.innerHTML = '<div class="empty-state">No users found</div>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="bulk-actions">
+            <input type="checkbox" id="select-all-users" class="select-all" onchange="toggleSelectAll()">
+            <label for="select-all-users">Select All</label>
+            <button onclick="bulkGiftLocations()"><i class="fas fa-gift"></i> Gift Selected</button>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr><th><input type="checkbox" id="header-select-all" onchange="toggleSelectAll()"></th><th>Username</th><th>Name</th><th>Email</th><th>Points</th><th>Contributed</th><th>Unlocked</th><th>Last Login</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                ${users.map(user => `
+                    <tr id="user-row-${user._id}">
+                        <td><input type="checkbox" class="user-select" data-id="${user._id}"></td>
+                        <td>${escapeHtml(user.username)}</td>
+                        <td>${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td>${user.points || 0}</td>
+                        <td>${user.contributedLocations?.length || 0}</td>
+                        <td>${user.earnedLocationIds?.length || 0}</td>
+                        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editUser('${user._id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="gift-btn" onclick="giftLocations('${user._id}')"><i class="fas fa-gift"></i> Gift</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('select-all-users') || document.getElementById('header-select-all');
+    const checkboxes = document.querySelectorAll('.user-select');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+function searchUsers() {
+    const searchTerm = document.getElementById('user-search').value.toLowerCase();
+    const searchField = document.getElementById('search-field').value;
+    
+    let filtered = allUsers;
+    
+    if (searchTerm) {
+        filtered = allUsers.filter(user => {
+            if (searchField === 'all') {
+                return user.username?.toLowerCase().includes(searchTerm) ||
+                       user.email?.toLowerCase().includes(searchTerm) ||
+                       user.firstName?.toLowerCase().includes(searchTerm) ||
+                       user.lastName?.toLowerCase().includes(searchTerm);
+            } else {
+                return user[searchField]?.toLowerCase().includes(searchTerm);
+            }
+        });
+    }
+    
+    displayUsers(filtered);
+}
+
+function editUser(userId) {
+    const user = allUsers.find(u => u._id === userId);
+    if (!user) return;
+    
+    currentEditUserId = userId;
+    document.getElementById('edit-username').value = user.username || '';
+    document.getElementById('edit-firstName').value = user.firstName || '';
+    document.getElementById('edit-lastName').value = user.lastName || '';
+    document.getElementById('edit-email').value = user.email || '';
+    document.getElementById('edit-points').value = user.points || 0;
+    
+    document.getElementById('userModal').classList.add('show');
+}
+
+async function saveUserEdit(event) {
+    event.preventDefault();
+    
+    const updatedData = {
+        username: document.getElementById('edit-username').value,
+        firstName: document.getElementById('edit-firstName').value,
+        lastName: document.getElementById('edit-lastName').value,
+        email: document.getElementById('edit-email').value,
+        points: parseInt(document.getElementById('edit-points').value)
+    };
+    
+    const row = document.getElementById(`user-row-${currentEditUserId}`);
+    row.classList.add('processing');
+    
+    try {
+        const response = await fetch('/api/admin/update-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ userId: currentEditUserId, ...updatedData })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            showToast('User updated successfully', 'success');
+            closeUserModal();
+            loadUsers();
+        } else {
+            row.classList.remove('processing');
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        row.classList.remove('processing');
+        showToast('Network error', 'error');
+    }
+}
+
+function closeUserModal() {
+    document.getElementById('userModal').classList.remove('show');
+    currentEditUserId = null;
+}
+
+async function giftLocations(userId) {
+    currentGiftUserId = userId;
+    document.getElementById('gift-count').value = '';
+    document.getElementById('giftModal').classList.add('show');
+}
+
+async function submitGift(event) {
+    event.preventDefault();
+    
+    const count = parseInt(document.getElementById('gift-count').value);
+    if (!count || count < 1) {
+        showToast('Please enter a valid number', 'error');
+        return;
+    }
+    
+    closeGiftModal();
+    
+    const userIds = Array.isArray(currentGiftUserId) ? currentGiftUserId : [currentGiftUserId];
+    
+    for (const uid of userIds) {
+        const row = document.getElementById(`user-row-${uid}`);
+        if (row) row.classList.add('processing');
+    }
+    
+    try {
+        const response = await fetch('/api/admin/gift-nearest-locations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ userIds, count })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            showToast(data.message, 'success');
+            loadUsers();
+        } else {
+            for (const uid of userIds) {
+                const row = document.getElementById(`user-row-${uid}`);
+                if (row) row.classList.remove('processing');
+            }
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        for (const uid of userIds) {
+            const row = document.getElementById(`user-row-${uid}`);
+            if (row) row.classList.remove('processing');
+        }
+        showToast('Network error', 'error');
+    }
+}
+
+async function bulkGiftLocations() {
+    const selectedUsers = [];
+    document.querySelectorAll('.user-select:checked').forEach(cb => {
+        selectedUsers.push(cb.dataset.id);
+    });
+    
+    if (selectedUsers.length === 0) {
+        showToast('Select at least one user', 'error');
+        return;
+    }
+    
+    currentGiftUserId = selectedUsers;
+    document.getElementById('gift-count').value = '';
+    document.getElementById('giftModal').classList.add('show');
+}
+
+function closeGiftModal() {
+    document.getElementById('giftModal').classList.remove('show');
+    currentGiftUserId = null;
 }
 
 function showToast(message, type = 'success') {
@@ -322,10 +1152,14 @@ function showToast(message, type = 'success') {
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
+
+document.getElementById('userEditForm').addEventListener('submit', saveUserEdit);
+document.getElementById('giftForm').addEventListener('submit', submitGift);
 
 async function init() {
     await checkAuth();

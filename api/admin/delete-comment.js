@@ -3,8 +3,7 @@ import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
-const LOCATIONS_COL = 'locations';
-const USERS_COL = 'users';
+const COMMENTS_COL = 'comments';
 
 let cachedClient = null;
 
@@ -32,7 +31,6 @@ function isAdmin(req) {
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Check if user is admin (you can set admin emails in env)
         const adminEmails = (process.env.ADMIN_EMAILS || '').split(',');
         return adminEmails.includes(decoded.email);
     } catch {
@@ -43,7 +41,7 @@ function isAdmin(req) {
 export default async function handler(req, res) {
     const allowedOrigin = process.env.ALLOWED_ORIGINS || 'http://localhost:3000';
     res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -51,45 +49,34 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    if (req.method !== 'GET') {
+    if (req.method !== 'DELETE') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Check if user is admin
     if (!isAdmin(req)) {
         return res.status(403).json({ error: 'Forbidden - Admin only' });
     }
 
+    const { commentId } = req.body;
+    if (!commentId) {
+        return res.status(400).json({ error: 'Comment ID required' });
+    }
+
     try {
         const client = await getClient();
-        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
-        const usersCol = client.db(DB).collection(USERS_COL);
+        const commentsCol = client.db(DB).collection(COMMENTS_COL);
+        const { ObjectId } = await import('mongodb');
         
-        const pendingLocations = await locationsCol.find({ status: 'pending' })
-            .sort({ createdAt: -1 })
-            .toArray();
+        const result = await commentsCol.deleteOne({ _id: new ObjectId(commentId) });
         
-        // Get user info for each location
-        const locationsWithUser = await Promise.all(pendingLocations.map(async (loc) => {
-            const user = await usersCol.findOne({ _id: loc.createdBy });
-            return {
-                ...loc,
-                user: user ? {
-                    username: user.username,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email
-                } : null
-            };
-        }));
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
         
-        return res.status(200).json({ 
-            success: true, 
-            locations: locationsWithUser 
-        });
+        return res.status(200).json({ success: true, message: 'Comment deleted' });
         
     } catch (err) {
-        console.error('Get pending locations error:', err);
-        return res.status(500).json({ error: 'Failed to get pending locations' });
+        console.error('Delete comment error:', err);
+        return res.status(500).json({ error: 'Failed to delete comment' });
     }
 }

@@ -3,8 +3,9 @@ import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
-const LOCATIONS_COL = 'locations';
+const COMMENTS_COL = 'comments';
 const USERS_COL = 'users';
+const LOCATIONS_COL = 'locations';
 
 let cachedClient = null;
 
@@ -32,7 +33,6 @@ function isAdmin(req) {
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Check if user is admin (you can set admin emails in env)
         const adminEmails = (process.env.ADMIN_EMAILS || '').split(',');
         return adminEmails.includes(decoded.email);
     } catch {
@@ -55,41 +55,48 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Check if user is admin
     if (!isAdmin(req)) {
         return res.status(403).json({ error: 'Forbidden - Admin only' });
     }
 
     try {
         const client = await getClient();
-        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
+        const commentsCol = client.db(DB).collection(COMMENTS_COL);
         const usersCol = client.db(DB).collection(USERS_COL);
+        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
+        const { ObjectId } = await import('mongodb');
         
-        const pendingLocations = await locationsCol.find({ status: 'pending' })
-            .sort({ createdAt: -1 })
-            .toArray();
+        const comments = await commentsCol.find({}).sort({ createdAt: -1 }).toArray();
         
-        // Get user info for each location
-        const locationsWithUser = await Promise.all(pendingLocations.map(async (loc) => {
-            const user = await usersCol.findOne({ _id: loc.createdBy });
+        const commentsWithInfo = await Promise.all(comments.map(async (comment) => {
+            let username = 'Unknown';
+            let locationTitle = 'Unknown';
+            
+            if (comment.userId) {
+                const user = await usersCol.findOne({ _id: comment.userId });
+                if (user) username = user.username;
+            }
+            
+            if (comment.locationId) {
+                const location = await locationsCol.findOne({ _id: comment.locationId });
+                if (location) locationTitle = location.title;
+            }
+            
             return {
-                ...loc,
-                user: user ? {
-                    username: user.username,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email
-                } : null
+                _id: comment._id.toString(),
+                username: username,
+                locationTitle: locationTitle,
+                text: comment.text,
+                createdAt: comment.createdAt,
+                upvotes: comment.votes?.filter(v => v.type === 'up').length || 0,
+                downvotes: comment.votes?.filter(v => v.type === 'down').length || 0
             };
         }));
         
-        return res.status(200).json({ 
-            success: true, 
-            locations: locationsWithUser 
-        });
+        return res.status(200).json({ comments: commentsWithInfo });
         
     } catch (err) {
-        console.error('Get pending locations error:', err);
-        return res.status(500).json({ error: 'Failed to get pending locations' });
+        console.error('Get comments error:', err);
+        return res.status(500).json({ error: 'Failed to get comments' });
     }
 }

@@ -545,6 +545,45 @@
         cursor: pointer;
         margin-top: 20px;
     }
+
+    .claim-btn {
+        background: #15803d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .location-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .location-title {
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    .location-level {
+        font-size: 10px;
+        color: #888;
+    }
+
+    .claim-single-btn {
+        background: #15803d;
+        color: white;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        cursor: pointer;
+    }
 </style>
 </head>
 <body>
@@ -720,7 +759,7 @@ async function loadAllLocations() {
 async function getComments(locationId) {
     console.log('Fetching comments for location:', locationId);
     try {
-        const response = await fetch(`/api/locations/comments/${locationId}`, { 
+        const response = await fetch(`/api/locations/comments?locationId=${locationId}`, { 
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -1157,14 +1196,141 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+async function claimLocation(locationId) {
+    try {
+        const response = await fetch('/api/user/claim-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ locationId })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showToast(data.message, 'success');
+            await refreshUserData();
+        } else {
+            showToast(data.error || 'Failed to claim location', 'error');
+        }
+    } catch (error) {
+        console.error('Claim error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+async function claimAllLocations() {
+    try {
+        const response = await fetch('/api/user/claim-all', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showToast(data.message, 'success');
+            await refreshUserData();
+        } else {
+            showToast(data.error || 'Failed to claim locations', 'error');
+        }
+    } catch (error) {
+        console.error('Claim all error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+async function loadDashboardData() {
+    const container = document.getElementById('modal-content-inner');
+    try {
+        const response = await fetch('/api/user/dashboard', { credentials: 'include' });
+        if (response.ok) {
+            const data = await response.json();
+            const availableDaily = data.user.daysSinceSignup - data.user.dailyLocationsClaimed;
+            
+            const unclaimedLocationsList = data.unclaimedLocations.map(loc => `
+                <div class="location-item">
+                    <div>
+                        <div class="location-title">${escapeHtml(loc.title)}</div>
+                        <div class="location-level">${loc.level.icon} ${loc.level.name}</div>
+                    </div>
+                    <button class="claim-single-btn" data-id="${loc._id}">Claim</button>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <div style="font-size:20px; font-weight:700;">${escapeHtml(data.user.firstName)} ${escapeHtml(data.user.lastName)}</div>
+                    <div style="font-size:13px; color:#666;">${escapeHtml(data.user.email)}</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">${data.user.points}</div><div class="stat-label">Points</div></div>
+                    <div class="stat-card"><div class="stat-number">${data.user.daysSinceSignup}</div><div class="stat-label">Days Active</div></div>
+                    <div class="stat-card"><div class="stat-number">${data.user.earnedLocationCount}</div><div class="stat-label">Unlocked</div></div>
+                    <div class="stat-card"><div class="stat-number">${data.user.unclaimedLocationCount}</div><div class="stat-label">Unclaimed</div></div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="font-size:14px; font-weight:600; margin-bottom:8px;">📅 Daily Check-ins</div>
+                    <div style="font-size:13px; color:#666;">${data.user.dailyLocationsClaimed} of ${data.user.daysSinceSignup} claimed</div>
+                    <div style="font-size:12px; color:${availableDaily > 0 ? '#15803d' : '#999'}; margin-top:5px;">
+                        ${availableDaily > 0 ? `${availableDaily} location${availableDaily !== 1 ? 's' : ''} available!` : 'No daily locations available'}
+                    </div>
+                    ${availableDaily > 0 ? `<button id="claimDailyBtn" class="claim-btn" style="width:100%;">Claim Daily Locations</button>` : ''}
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size:14px; font-weight:600;">🎁 Unclaimed Locations (${data.user.unclaimedLocationCount})</div>
+                        ${data.user.unclaimedLocationCount > 0 ? `<button id="claimAllBtn" style="background:#15803d; color:white; border:none; padding:4px 12px; border-radius:8px; font-size:11px; cursor:pointer;">Claim All</button>` : ''}
+                    </div>
+                    <div id="unclaimedLocationsList" style="max-height: 200px; overflow-y: auto;">
+                        ${data.user.unclaimedLocationCount > 0 ? unclaimedLocationsList : '<div style="text-align:center; padding:20px; color:#999;">No unclaimed locations</div>'}
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            `;
+            
+            document.querySelectorAll('.claim-single-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await claimLocation(btn.dataset.id);
+                    loadDashboardData();
+                    await refreshUserData();
+                });
+            });
+            
+            const claimAllBtn = document.getElementById('claimAllBtn');
+            if (claimAllBtn) {
+                claimAllBtn.addEventListener('click', async () => {
+                    await claimAllLocations();
+                    loadDashboardData();
+                    await refreshUserData();
+                });
+            }
+            
+            const claimDailyBtn = document.getElementById('claimDailyBtn');
+            if (claimDailyBtn) {
+                claimDailyBtn.addEventListener('click', async () => {
+                    if (!userLocation) {
+                        showToast('Getting your location first...', 'error');
+                        return;
+                    }
+                    await claimDailyLocations();
+                    loadDashboardData();
+                    await refreshUserData();
+                });
+            }
+        } else if (response.status === 401) {
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Please <a href="/login.html">login</a> to view settings</div>';
+        } else {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#b00020;">Failed to load settings. Please try again.</div>';
+        }
+    } catch (error) {
+        console.error('Dashboard error:', error);
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#b00020;">Network error loading settings</div>';
+    }
+}
+
 function openSettingsModal() {
     const modal = document.getElementById('settingsModal');
     modal.classList.add('show');
-    document.getElementById('modal-content-inner').innerHTML = `
-        <div style="text-align:center; padding:20px;">
-            <i class="fas fa-spinner fa-spin"></i> Loading...
-        </div>
-    `;
+    loadDashboardData();
 }
 
 function closeSettingsModal() {

@@ -16,9 +16,9 @@ async function getClient() {
     return client;
 }
 
-function getUserIdFromCookie(req) {
+function isAdmin(req) {
     const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) return null;
+    if (!cookieHeader) return false;
     
     const cookies = {};
     cookieHeader.split(';').forEach(cookie => {
@@ -27,20 +27,21 @@ function getUserIdFromCookie(req) {
     });
     
     const token = cookies.auth_token;
-    if (!token) return null;
+    if (!token) return false;
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return decoded.userId;
+        const adminEmails = (process.env.ADMIN_EMAILS || '').split(',');
+        return adminEmails.includes(decoded.email);
     } catch {
-        return null;
+        return false;
     }
 }
 
 export default async function handler(req, res) {
     const allowedOrigin = process.env.ALLOWED_ORIGINS || 'http://localhost:3000';
     res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -48,50 +49,30 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    if (req.method !== 'POST') {
+    if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const userId = getUserIdFromCookie(req);
-    if (!userId) {
-        return res.status(401).json({ error: 'Not authenticated' });
-    }
-
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
+    if (!isAdmin(req)) {
+        return res.status(403).json({ error: 'Forbidden - Admin only' });
     }
 
     try {
         const client = await getClient();
         const usersCol = client.db(DB).collection(USERS_COL);
-        const { ObjectId } = await import('mongodb');
-
-        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
         
-        const unclaimedIds = user.unclaimedLocationIds || [];
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
-        }
+        const users = await usersCol.find({}).sort({ createdAt: -1 }).toArray();
         
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
-            }
-        );
-        
-        return res.status(200).json({
-            success: true,
-            message: 'Location claimed successfully!'
+        // Remove passwords from response
+        const safeUsers = users.map(user => {
+            const { password, ...safeUser } = user;
+            return safeUser;
         });
         
+        return res.status(200).json({ users: safeUsers });
+        
     } catch (err) {
-        console.error('Claim location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Get users error:', err);
+        return res.status(500).json({ error: 'Failed to get users' });
     }
 }

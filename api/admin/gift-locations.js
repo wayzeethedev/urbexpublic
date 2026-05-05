@@ -16,9 +16,9 @@ async function getClient() {
     return client;
 }
 
-function getUserIdFromCookie(req) {
+function isAdmin(req) {
     const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) return null;
+    if (!cookieHeader) return false;
     
     const cookies = {};
     cookieHeader.split(';').forEach(cookie => {
@@ -27,13 +27,14 @@ function getUserIdFromCookie(req) {
     });
     
     const token = cookies.auth_token;
-    if (!token) return null;
+    if (!token) return false;
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return decoded.userId;
+        const adminEmails = (process.env.ADMIN_EMAILS || '').split(',');
+        return adminEmails.includes(decoded.email);
     } catch {
-        return null;
+        return false;
     }
 }
 
@@ -52,46 +53,42 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const userId = getUserIdFromCookie(req);
-    if (!userId) {
-        return res.status(401).json({ error: 'Not authenticated' });
+    if (!isAdmin(req)) {
+        return res.status(403).json({ error: 'Forbidden - Admin only' });
     }
 
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
+    const { userId, locationIds } = req.body;
+    
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID required' });
+    }
+    
+    if (!locationIds || !locationIds.length) {
+        return res.status(400).json({ error: 'Location IDs required' });
     }
 
     try {
         const client = await getClient();
         const usersCol = client.db(DB).collection(USERS_COL);
         const { ObjectId } = await import('mongodb');
-
-        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+        
+        const userIds = Array.isArray(userId) ? userId.map(id => new ObjectId(id)) : [new ObjectId(userId)];
+        
+        for (const uid of userIds) {
+            await usersCol.updateOne(
+                { _id: uid },
+                { $addToSet: { earnedLocationIds: { $each: locationIds } } }
+            );
         }
         
-        const unclaimedIds = user.unclaimedLocationIds || [];
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
-        }
-        
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
-            }
-        );
-        
-        return res.status(200).json({
-            success: true,
-            message: 'Location claimed successfully!'
+        const count = userIds.length;
+        return res.status(200).json({ 
+            success: true, 
+            message: `Gifted ${locationIds.length} locations to ${count} user${count !== 1 ? 's' : ''}` 
         });
         
     } catch (err) {
-        console.error('Claim location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Gift locations error:', err);
+        return res.status(500).json({ error: 'Failed to gift locations' });
     }
 }
