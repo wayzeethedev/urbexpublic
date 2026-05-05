@@ -1,6 +1,3 @@
-// Add this endpoint for when a user visits/claims a location
-// api/locations/visit.js
-
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
@@ -71,36 +68,60 @@ export default async function handler(req, res) {
         const usersCol = client.db(DB).collection(USERS_COL);
         const { ObjectId } = await import('mongodb');
 
-        // Check if location is in user's unclaimed list
         const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        const unclaimedIds = user.unclaimedLocationIds || [];
-        
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
         }
 
-        // Move from unclaimed to earned
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
+        const location = await locationsCol.findOne({ _id: new ObjectId(locationId) });
+        if (!location) {
+            return res.status(404).json({ error: 'Location not found' });
+        }
+
+        const hasVisited = user.visitedLocationIds && user.visitedLocationIds.includes(locationId);
+        
+        if (!hasVisited) {
+            await usersCol.updateOne(
+                { _id: new ObjectId(userId) },
+                { 
+                    $addToSet: { 
+                        visitedLocationIds: locationId,
+                        earnedLocationIds: locationId
+                    }
+                }
+            );
+
+            const visitorIds = location.visitorIds || [];
+            if (!visitorIds.includes(userId)) {
+                visitorIds.push(userId);
+                const newVisitorCount = visitorIds.length;
+                
+                await locationsCol.updateOne(
+                    { _id: new ObjectId(locationId) },
+                    { 
+                        $set: { 
+                            visitorCount: newVisitorCount,
+                            visitorIds: visitorIds
+                        }
+                    }
+                );
             }
-        );
 
-        // Increment visitor count for the location
-        await locationsCol.updateOne(
-            { _id: new ObjectId(locationId) },
-            { $inc: { visitorCount: 1 } }
-        );
+            return res.status(200).json({ 
+                success: true, 
+                message: 'Location marked as visited!',
+                isConfirmed: location.visitorCount + 1 > 1
+            });
+        }
 
-        return res.status(200).json({
-            success: true,
-            message: 'Location claimed and explored!'
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Already visited this location',
+            isConfirmed: location.visitorCount > 1
         });
 
     } catch (err) {
         console.error('Visit location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        return res.status(500).json({ error: 'Failed to process visit' });
     }
 }

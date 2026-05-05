@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Admin Dashboard - Vestige</title>
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .pending-count {
+        background: #ff3b3b;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .locations-grid {
+        display: grid;
+        gap: 20px;
+    }
+
+    .location-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .location-images {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+        padding: 10px;
+        background: #f0f0f0;
+    }
+
+    .location-images img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .location-info {
+        padding: 20px;
+    }
+
+    .location-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .location-meta {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .location-description {
+        color: #444;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+
+    .location-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .tag {
+        background: #f0f0f0;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .level {
+        display: inline-block;
+        background: #ff3b3b20;
+        color: #ff3b3b;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+
+    .approval-section {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .points-input {
+        width: 80px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .approve-btn {
+        background: #15803d;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .deny-btn {
+        background: #b00020;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 50px;
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #111;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: #666;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Admin Dashboard <span id="pending-count" class="pending-count">0</span></h1>
+    <div id="locations-container" class="locations-grid">
+        <div class="loading">Loading pending locations...</div>
+    </div>
+</div>
+
+<script>
+let pendingLocations = [];
+
+async function checkAuth() {
+    const response = await fetch('/api/check-auth', { credentials: 'include' });
+    if (!response.ok) {
+        window.location.href = '/login.html';
+        return null;
+    }
+    return response.json();
+}
+
+async function loadPendingLocations() {
+    try {
+        const response = await fetch('/api/locations/pending', { credentials: 'include' });
+        if (response.ok) {
+            const data = await response.json();
+            pendingLocations = data.locations;
+            document.getElementById('pending-count').textContent = pendingLocations.length;
+            displayLocations();
+        } else {
+            showToast('Failed to load pending locations', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading locations:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+function displayLocations() {
+    const container = document.getElementById('locations-container');
+    
+    if (pendingLocations.length === 0) {
+        container.innerHTML = '<div class="empty-state">✨ No pending locations to review</div>';
+        return;
+    }
+    
+    container.innerHTML = pendingLocations.map(loc => `
+        <div class="location-card" data-id="${loc._id}">
+            <div class="location-images">
+                ${loc.images && loc.images.length > 0 ? 
+                    loc.images.map(img => `<img src="${img}" alt="Location image">`).join('') : 
+                    '<div style="padding: 20px; color: #999;">No images</div>'
+                }
+            </div>
+            <div class="location-info">
+                <h3 class="location-title">${escapeHtml(loc.title)}</h3>
+                <div class="location-meta">
+                    Submitted by: <strong>${loc.user?.username || 'Unknown'}</strong> | 
+                    ${new Date(loc.createdAt).toLocaleDateString()}
+                </div>
+                <div class="location-description">${escapeHtml(loc.description)}</div>
+                <div class="level">${loc.level.icon} ${loc.level.name}</div>
+                <div class="location-tags">
+                    ${loc.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <div class="approval-section">
+                    <input type="number" id="points-${loc._id}" class="points-input" placeholder="Points" min="2" max="20">
+                    <button class="approve-btn" onclick="approveLocation('${loc._id}')">Approve</button>
+                    <button class="deny-btn" onclick="denyLocation('${loc._id}')">Deny</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function approveLocation(locationId) {
+    const pointsInput = document.getElementById(`points-${locationId}`);
+    const points = parseInt(pointsInput.value);
+    
+    if (!points || points < 2 || points > 20) {
+        showToast('Please enter points between 2 and 20', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/locations/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ locationId, action: 'approve', points })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(data.message, 'success');
+            // Remove from list
+            pendingLocations = pendingLocations.filter(l => l._id !== locationId);
+            displayLocations();
+            document.getElementById('pending-count').textContent = pendingLocations.length;
+        } else {
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Approve error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+async function denyLocation(locationId) {
+    const reason = prompt('Enter reason for denial (optional):');
+    
+    try {
+        const response = await fetch('/api/locations/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ locationId, action: 'deny', deniedReason: reason || 'No reason provided' })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(data.message, 'success');
+            pendingLocations = pendingLocations.filter(l => l._id !== locationId);
+            displayLocations();
+            document.getElementById('pending-count').textContent = pendingLocations.length;
+        } else {
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Deny error:', error);
+        showToast('Network error', 'error');
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toast.style.background = type === 'error' ? '#b00020' : '#15803d';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function init() {
+    await checkAuth();
+    await loadPendingLocations();
+}
+
+init();
+</script>
+</body>
+</html>

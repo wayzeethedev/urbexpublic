@@ -1,12 +1,8 @@
-// Add this endpoint for when a user visits/claims a location
-// api/locations/visit.js
-
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
-const LOCATIONS_COL = 'locations';
 const USERS_COL = 'users';
 
 let cachedClient = null;
@@ -60,47 +56,42 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
-    }
-
     try {
         const client = await getClient();
-        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
         const usersCol = client.db(DB).collection(USERS_COL);
         const { ObjectId } = await import('mongodb');
 
-        // Check if location is in user's unclaimed list
         const user = await usersCol.findOne({ _id: new ObjectId(userId) });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
         const unclaimedIds = user.unclaimedLocationIds || [];
         
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
+        if (unclaimedIds.length === 0) {
+            return res.status(200).json({
+                success: true,
+                claimedCount: 0,
+                message: 'No locations to claim'
+            });
         }
-
-        // Move from unclaimed to earned
+        
         await usersCol.updateOne(
             { _id: new ObjectId(userId) },
             {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
+                $pull: { unclaimedLocationIds: { $in: unclaimedIds } },
+                $addToSet: { earnedLocationIds: { $each: unclaimedIds } }
             }
         );
-
-        // Increment visitor count for the location
-        await locationsCol.updateOne(
-            { _id: new ObjectId(locationId) },
-            { $inc: { visitorCount: 1 } }
-        );
-
+        
         return res.status(200).json({
             success: true,
-            message: 'Location claimed and explored!'
+            claimedCount: unclaimedIds.length,
+            message: `Claimed ${unclaimedIds.length} locations!`
         });
-
+        
     } catch (err) {
-        console.error('Visit location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Claim all error:', err);
+        return res.status(500).json({ error: 'Failed to claim locations' });
     }
 }

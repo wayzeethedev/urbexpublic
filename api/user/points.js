@@ -1,12 +1,8 @@
-// Add this endpoint for when a user visits/claims a location
-// api/locations/visit.js
-
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
-const LOCATIONS_COL = 'locations';
 const USERS_COL = 'users';
 
 let cachedClient = null;
@@ -43,7 +39,7 @@ function getUserIdFromCookie(req) {
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -51,7 +47,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    if (req.method !== 'POST') {
+    if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
@@ -60,47 +56,24 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
-    }
-
     try {
         const client = await getClient();
-        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
         const usersCol = client.db(DB).collection(USERS_COL);
         const { ObjectId } = await import('mongodb');
-
-        // Check if location is in user's unclaimed list
-        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        const unclaimedIds = user.unclaimedLocationIds || [];
         
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
+        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
         }
-
-        // Move from unclaimed to earned
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
-            }
-        );
-
-        // Increment visitor count for the location
-        await locationsCol.updateOne(
-            { _id: new ObjectId(locationId) },
-            { $inc: { visitorCount: 1 } }
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: 'Location claimed and explored!'
+        
+        return res.status(200).json({ 
+            points: user.points || 0,
+            hasInitialLocations: user.unlockedLocations && user.unlockedLocations.length > 0
         });
-
+        
     } catch (err) {
-        console.error('Visit location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Get points error:', err);
+        return res.status(500).json({ error: 'Failed to get points' });
     }
 }

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Upload Location - Vestige</title>
 
-<!-- Font Awesome 6 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
@@ -21,7 +20,6 @@
         padding-bottom: 80px;
     }
 
-    /* Header */
     .header {
         background: white;
         padding: 15px 20px;
@@ -49,18 +47,12 @@
         padding: 5px;
     }
 
-    .back-btn:hover {
-        color: #111;
-    }
-
-    /* Main Content */
     .container {
         max-width: 600px;
         margin: 0 auto;
         padding: 20px;
     }
 
-    /* Form Groups */
     .form-group {
         margin-bottom: 24px;
     }
@@ -74,8 +66,7 @@
     }
 
     .form-group input,
-    .form-group textarea,
-    .form-group select {
+    .form-group textarea {
         width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
@@ -83,15 +74,12 @@
         font-size: 14px;
         font-family: inherit;
         background: white;
-        transition: all 0.2s;
     }
 
     .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
+    .form-group textarea:focus {
         outline: none;
         border-color: #ff3b3b;
-        box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
     }
 
     .form-group textarea {
@@ -99,20 +87,71 @@
         min-height: 100px;
     }
 
-    /* Image Upload */
+    .coordinate-input-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .coordinate-input-group input {
+        flex: 1;
+    }
+
+    .paste-btn {
+        padding: 12px 16px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .paste-btn:hover {
+        background: #e5e5e5;
+    }
+
+    .coordinate-preview {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #666;
+        display: none;
+    }
+
+    .coordinate-preview.show {
+        display: block;
+    }
+
+    .get-location-btn {
+        background: #111;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .get-location-btn:hover {
+        opacity: 0.9;
+    }
+
     .image-upload-area {
         border: 2px dashed #ddd;
         border-radius: 12px;
         padding: 20px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.2s;
         background: #fafafa;
     }
 
     .image-upload-area:hover {
         border-color: #ff3b3b;
-        background: #fff;
     }
 
     .image-upload-area i {
@@ -153,17 +192,9 @@
         width: 24px;
         height: 24px;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         font-size: 12px;
     }
 
-    .remove-image:hover {
-        background: rgba(0,0,0,0.8);
-    }
-
-    /* Level Select */
     .level-options {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -191,6 +222,9 @@
         height: 50px;
         object-fit: contain;
         margin-bottom: 8px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .level-option span {
@@ -199,7 +233,6 @@
         display: block;
     }
 
-    /* Tags */
     .tags-container {
         display: flex;
         flex-wrap: wrap;
@@ -234,7 +267,6 @@
         font-size: 13px;
     }
 
-    /* Submit Button */
     .submit-btn {
         width: 100%;
         padding: 14px;
@@ -245,12 +277,7 @@
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: opacity 0.2s;
         margin-top: 20px;
-    }
-
-    .submit-btn:hover {
-        opacity: 0.9;
     }
 
     .submit-btn:disabled {
@@ -258,7 +285,6 @@
         cursor: not-allowed;
     }
 
-    /* Bottom Navigation */
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -267,7 +293,6 @@
         height: 70px;
         background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(8px);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -285,13 +310,10 @@
         text-decoration: none;
         color: #5e6873;
         font-size: 0.75rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
         background: transparent;
         border: none;
         cursor: pointer;
         padding: 8px 0;
-        border-radius: 40px;
     }
 
     .nav-item i {
@@ -314,6 +336,14 @@
         font-size: 13px;
         z-index: 1100;
         animation: fadeInUp 0.3s ease;
+    }
+
+    .toast.error {
+        background: #b00020;
+    }
+
+    .toast.success {
+        background: #15803d;
     }
 
     @keyframes fadeInUp {
@@ -355,11 +385,25 @@
         </div>
 
         <div class="form-group">
-            <label>Photos (up to 9)</label>
+            <label>Coordinates *</label>
+            <div class="coordinate-input-group">
+                <input type="text" id="coordinates" placeholder="Paste coordinates (e.g., 44.8614, -92.6238 or 44°51'41\"N 92°37'25\"W)">
+                <button type="button" class="paste-btn" id="paste-coords-btn">
+                    <i class="fas fa-paste"></i> Paste
+                </button>
+            </div>
+            <div id="coordinate-preview" class="coordinate-preview"></div>
+            <button type="button" class="get-location-btn" id="get-location-btn">
+                <i class="fas fa-location-dot"></i> Use My Current Location
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label>Photos (up to 9 - optional)</label>
             <div class="image-upload-area" id="image-upload-area">
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p>Click or drag to upload photos</p>
-                <p style="font-size: 12px; color: #999;">Up to 9 images, JPG or PNG</p>
+                <p>Click to upload photos</p>
+                <p style="font-size: 12px; color: #999;">Up to 9 images (optional)</p>
             </div>
             <div class="image-preview-grid" id="image-preview-grid"></div>
             <input type="file" id="image-input" multiple accept="image/jpeg,image/png,image/jpg">
@@ -388,36 +432,130 @@
         <i class="fas fa-plus-circle"></i>
         <span>Upload</span>
     </a>
-    <a href="/profile.html" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>Profile</span>
-    </a>
 </div>
 
 <script>
+const CLOUD_NAME = "dmwqfzdyt";
+const UPLOAD_PRESET = "urbex_upload";
+
 let selectedFiles = [];
 let selectedLevel = null;
 let selectedTags = [];
 let levelsData = [];
 let tagsData = [];
+let currentCoordinates = null;
 
-// Load levels from JSON
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function parseCoordinates(input) {
+    input = input.trim();
+    
+    let match = input.match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+    if (match) {
+        return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+    }
+    
+    match = input.match(/^(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)$/);
+    if (match) {
+        return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+    }
+    
+    const dmsMatch = input.match(/(\d+)°(\d+)'(\d+)"([NS])\s+(\d+)°(\d+)'(\d+)"([EW])/i);
+    if (dmsMatch) {
+        let lat = parseInt(dmsMatch[1]) + parseInt(dmsMatch[2])/60 + parseInt(dmsMatch[3])/3600;
+        if (dmsMatch[4] === 'S') lat = -lat;
+        
+        let lng = parseInt(dmsMatch[5]) + parseInt(dmsMatch[6])/60 + parseInt(dmsMatch[7])/3600;
+        if (dmsMatch[8] === 'W') lng = -lng;
+        
+        return { lat, lng };
+    }
+    
+    const dmmMatch = input.match(/(\d+)°([\d.]+)'([NS])\s+(\d+)°([\d.]+)'([EW])/i);
+    if (dmmMatch) {
+        let lat = parseInt(dmmMatch[1]) + parseFloat(dmmMatch[2])/60;
+        if (dmmMatch[3] === 'S') lat = -lat;
+        
+        let lng = parseInt(dmmMatch[4]) + parseFloat(dmmMatch[5])/60;
+        if (dmmMatch[6] === 'W') lng = -lng;
+        
+        return { lat, lng };
+    }
+    
+    return null;
+}
+
+function updateCoordinatePreview() {
+    const input = document.getElementById('coordinates').value;
+    const previewDiv = document.getElementById('coordinate-preview');
+    
+    if (!input.trim()) {
+        previewDiv.classList.remove('show');
+        currentCoordinates = null;
+        return;
+    }
+    
+    const coords = parseCoordinates(input);
+    if (coords && !isNaN(coords.lat) && !isNaN(coords.lng)) {
+        currentCoordinates = coords;
+        previewDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #15803d;"></i> Parsed: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+        previewDiv.classList.add('show');
+    } else {
+        previewDiv.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #b00020;"></i> Invalid format. Use formats like: 44.8614, -92.6238 or 44°51'41"N 92°37'25"W`;
+        previewDiv.classList.add('show');
+        currentCoordinates = null;
+    }
+}
+
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        showToast('Geolocation not supported', 'error');
+        return;
+    }
+    
+    showToast('Getting your location...', 'info');
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            document.getElementById('coordinates').value = `${latitude}, ${longitude}`;
+            updateCoordinatePreview();
+            showToast('Location detected!', 'success');
+        },
+        (error) => {
+            let errorMessage = 'Could not get location';
+            if (error.code === 1) errorMessage = 'Permission denied. Please allow location access.';
+            if (error.code === 2) errorMessage = 'Location unavailable';
+            showToast(errorMessage, 'error');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
 async function loadLevels() {
     try {
         const response = await fetch('/assets/json/levels.json');
-        levelsData = await response.json();
-        displayLevels();
+        if (response.ok) {
+            levelsData = await response.json();
+        } else {
+            throw new Error('Failed to load levels');
+        }
     } catch (error) {
         console.error('Error loading levels:', error);
-        // Fallback default levels
         levelsData = [
-            { name: 'Beginner', icon: '/assets/icons/beginner.png', value: 'beginner' },
-            { name: 'Intermediate', icon: '/assets/icons/intermediate.png', value: 'intermediate' },
-            { name: 'Advanced', icon: '/assets/icons/advanced.png', value: 'advanced' },
-            { name: 'Expert', icon: '/assets/icons/expert.png', value: 'expert' }
+            { name: 'Beginner', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'beginner' },
+            { name: 'Intermediate', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'intermediate' },
+            { name: 'Advanced', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'advanced' },
+            { name: 'Expert', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'expert' }
         ];
-        displayLevels();
     }
+    displayLevels();
 }
 
 function displayLevels() {
@@ -428,7 +566,7 @@ function displayLevels() {
         div.className = 'level-option';
         div.dataset.value = level.value;
         div.innerHTML = `
-            <img src="${level.icon}" alt="${level.name}" onerror="this.src='/assets/images/default-icon.png'">
+            <img src="${level.icon}" alt="${level.name}">
             <span>${level.name}</span>
         `;
         div.addEventListener('click', () => {
@@ -440,23 +578,24 @@ function displayLevels() {
     });
 }
 
-// Load tags from JSON
 async function loadTags() {
     try {
         const response = await fetch('/assets/json/tags.json');
-        tagsData = await response.json();
-        displayTags();
+        if (response.ok) {
+            tagsData = await response.json();
+        } else {
+            throw new Error('Failed to load tags');
+        }
     } catch (error) {
         console.error('Error loading tags:', error);
-        // Fallback default tags
         tagsData = [
-            { name: 'Abandoned', icon: '/assets/icons/abandoned.png', value: 'abandoned' },
-            { name: 'Nature', icon: '/assets/icons/nature.png', value: 'nature' },
-            { name: 'Urban', icon: '/assets/icons/urban.png', value: 'urban' },
-            { name: 'Historical', icon: '/assets/icons/historical.png', value: 'historical' }
+            { name: 'Abandoned', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'abandoned' },
+            { name: 'Nature', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'nature' },
+            { name: 'Urban', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'urban' },
+            { name: 'Historical', icon: 'https://cdn-icons-png.flaticon.com/512/9584/9584876.png', value: 'historical' }
         ];
-        displayTags();
     }
+    displayTags();
 }
 
 function displayTags() {
@@ -467,7 +606,7 @@ function displayTags() {
         chip.className = 'tag-chip';
         chip.dataset.value = tag.value;
         chip.innerHTML = `
-            <img src="${tag.icon}" alt="${tag.name}" onerror="this.src='/assets/images/default-icon.png'">
+            <img src="${tag.icon}" alt="${tag.name}">
             <span>${tag.name}</span>
         `;
         chip.addEventListener('click', () => {
@@ -483,29 +622,12 @@ function displayTags() {
     });
 }
 
-// Image upload handling
 const imageUploadArea = document.getElementById('image-upload-area');
 const imageInput = document.getElementById('image-input');
 const imagePreviewGrid = document.getElementById('image-preview-grid');
 
 imageUploadArea.addEventListener('click', () => {
     imageInput.click();
-});
-
-imageUploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    imageUploadArea.style.borderColor = '#ff3b3b';
-});
-
-imageUploadArea.addEventListener('dragleave', () => {
-    imageUploadArea.style.borderColor = '#ddd';
-});
-
-imageUploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    imageUploadArea.style.borderColor = '#ddd';
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
 });
 
 imageInput.addEventListener('change', (e) => {
@@ -518,7 +640,7 @@ function handleFiles(files) {
     const totalFiles = selectedFiles.length + imageFiles.length;
     
     if (totalFiles > 9) {
-        showToast('Maximum 9 images allowed');
+        showToast('Maximum 9 images allowed', 'error');
         return;
     }
     
@@ -528,9 +650,10 @@ function handleFiles(files) {
         reader.onload = (e) => {
             const previewDiv = document.createElement('div');
             previewDiv.className = 'image-preview';
+            const idx = selectedFiles.length - 1;
             previewDiv.innerHTML = `
                 <img src="${e.target.result}" alt="Preview">
-                <button class="remove-image" onclick="removeImage(${selectedFiles.indexOf(file)})">×</button>
+                <button class="remove-image" onclick="removeImage(${idx})">×</button>
             `;
             imagePreviewGrid.appendChild(previewDiv);
         };
@@ -540,7 +663,7 @@ function handleFiles(files) {
     imageInput.value = '';
 }
 
-function removeImage(index) {
+window.removeImage = function(index) {
     selectedFiles.splice(index, 1);
     refreshImagePreview();
 }
@@ -562,83 +685,108 @@ function refreshImagePreview() {
     });
 }
 
-// Upload images to Cloudinary
-async function uploadImages() {
+async function uploadToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET);
+
+    try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+            return data.secure_url;
+        } else {
+            throw new Error(data.error?.message || 'Upload failed');
+        }
+    } catch (error) {
+        console.error('Cloudinary upload error:', error);
+        throw error;
+    }
+}
+
+async function uploadAllImages() {
+    if (selectedFiles.length === 0) {
+        return [];
+    }
+    
     const uploadedUrls = [];
     
-    for (const file of selectedFiles) {
-        const formData = new FormData();
-        formData.append('photo', file);
+    for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
         
         try {
-            const response = await fetch('/api/locations/upload-image', {
-                method: 'POST',
-                credentials: 'include',
-                body: formData
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                uploadedUrls.push(data.photoUrl);
-            } else {
-                throw new Error('Upload failed');
-            }
+            showToast(`Uploading image ${i + 1}/${selectedFiles.length}...`, 'info');
+            const url = await uploadToCloudinary(file);
+            uploadedUrls.push(url);
         } catch (error) {
-            console.error('Image upload error:', error);
-            showToast(`Failed to upload ${file.name}`);
+            console.error('Upload error:', error);
+            showToast(`Failed to upload "${file.name}"`, 'error');
             return null;
         }
     }
     
+    showToast(`Successfully uploaded ${uploadedUrls.length} images!`, 'success');
     return uploadedUrls;
 }
 
-// Submit location
 async function submitLocation(e) {
     e.preventDefault();
     
     const title = document.getElementById('title').value.trim();
     const description = document.getElementById('description').value.trim();
+    const coordinatesInput = document.getElementById('coordinates').value.trim();
     
     if (!title) {
-        showToast('Please enter a title');
+        showToast('Please enter a title', 'error');
         return;
     }
     
     if (!description) {
-        showToast('Please enter a description');
+        showToast('Please enter a description', 'error');
+        return;
+    }
+    
+    if (!coordinatesInput) {
+        showToast('Please enter coordinates', 'error');
+        return;
+    }
+    
+    if (!currentCoordinates) {
+        showToast('Please enter valid coordinates', 'error');
         return;
     }
     
     if (!selectedLevel) {
-        showToast('Please select a difficulty level');
+        showToast('Please select a difficulty level', 'error');
         return;
     }
     
     const submitBtn = document.getElementById('submit-btn');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.textContent = 'Submitting...';
     
-    // Upload images first
-    const imageUrls = await uploadImages();
-    if (imageUrls === null && selectedFiles.length > 0) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Publish Location';
-        return;
+    let imageUrls = [];
+    if (selectedFiles.length > 0) {
+        imageUrls = await uploadAllImages();
+        if (imageUrls === null) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publish Location';
+            return;
+        }
     }
     
-    // Get current location from map (for now, use default)
-    // In a real implementation, you'd get this from the map or a location picker
     const locationData = {
         title,
         description,
-        images: imageUrls || [],
+        images: imageUrls,
         level: selectedLevel,
         tags: selectedTags.map(t => t.value),
-        coordinates: {
-            lat: 44.8614,
-            lng: -92.6238
-        }
+        coordinates: currentCoordinates
     };
     
     try {
@@ -649,35 +797,42 @@ async function submitLocation(e) {
             body: JSON.stringify(locationData)
         });
         
-        if (response.ok) {
-            showToast('Location published successfully!');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            showToast('Location submitted for approval!', 'success');
             setTimeout(() => {
                 window.location.href = '/map.html';
             }, 1500);
         } else {
-            const error = await response.json();
-            showToast(error.error || 'Failed to publish location');
+            showToast(data.error || 'Failed to submit location', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Publish Location';
         }
     } catch (error) {
         console.error('Submit error:', error);
-        showToast('Network error. Please try again.');
+        showToast('Network error. Please try again.', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Publish Location';
     }
 }
 
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+async function pasteFromClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('coordinates').value = text;
+        updateCoordinatePreview();
+        showToast('Coordinates pasted!', 'success');
+    } catch (err) {
+        showToast('Could not paste. Please allow clipboard access.', 'error');
+    }
 }
 
-// Initialize
+document.getElementById('coordinates').addEventListener('input', updateCoordinatePreview);
+document.getElementById('get-location-btn').addEventListener('click', getCurrentLocation);
+document.getElementById('paste-coords-btn').addEventListener('click', pasteFromClipboard);
 document.getElementById('upload-form').addEventListener('submit', submitLocation);
+
 loadLevels();
 loadTags();
 </script>

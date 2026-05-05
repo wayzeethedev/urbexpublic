@@ -1,52 +1,202 @@
 [
-    {
-        "name": "Abandoned",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "abandoned"
-    },
-    {
-        "name": "Nature",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "nature"
-    },
-    {
-        "name": "Urban",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "urban"
-    },
-    {
-        "name": "Historical",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "historical"
-    },
-    {
-        "name": "Industrial",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "industrial"
-    },
-    {
-        "name": "Hospital",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "hospital"
-    },
-    {
-        "name": "School",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "school"
-    },
-    {
-        "name": "Church",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "church"
-    },
-    {
-        "name": "Cave",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "cave"
-    },
-    {
-        "name": "Waterfall",
-        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
-        "value": "waterfall"
-    }
+  {
+    "name": "Vicious Dogs",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "vicious_dogs"
+  },
+  {
+    "name": "Radioactive",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "radioactive"
+  },
+  {
+    "name": "Biohazard",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "biohazard"
+  },
+  {
+    "name": "Dead Air",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "dead_air"
+  },
+  {
+    "name": "Asbestos",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "asbestos"
+  },
+  {
+    "name": "Fire Hazard",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "fire_hazard"
+  },
+  {
+    "name": "Electrical Shock Hazard",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "electrical_shock_hazard"
+  },
+  {
+    "name": "Homeless Presence",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "homeless_presence"
+  },
+  {
+    "name": "Violence / Crime Risk",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "violence_crime_risk"
+  },
+  {
+    "name": "Ghosts",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "ghosts"
+  },
+  {
+    "name": "Unstable Structure",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "unstable_structure"
+  },
+  {
+    "name": "Black Mold",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "black_mold"
+  },
+  {
+    "name": "Ticks",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "ticks"
+  },
+  {
+    "name": "Mosquitos",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "mosquitos"
+  },
+  {
+    "name": "Broken Glass",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "broken_glass"
+  },
+  {
+    "name": "Flashlight Recommended",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "flashlight_recommended"
+  },
+  {
+    "name": "Boat Access",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "boat_access"
+  },
+  {
+    "name": "Ropes Recommended",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "ropes_recommended"
+  },
+  {
+    "name": "Hardhat Recommended",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "hardhat_recommended"
+  },
+  {
+    "name": "Boots Recommended",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "boots_recommended"
+  },
+  {
+    "name": "Respirator Recommended",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "respirator_recommended"
+  },
+  {
+    "name": "Security / Police Presence",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "security_police_presence"
+  },
+  {
+    "name": "Cameras",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "cameras"
+  },
+  {
+    "name": "Motion Detectors",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "motion_detectors"
+  },
+  {
+    "name": "Alarms",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "alarms"
+  },
+  {
+    "name": "No Trespassing Posted",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "no_trespassing_posted"
+  },
+  {
+    "name": "Private Property Posted",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "private_property_posted"
+  },
+  {
+    "name": "Water Level Changes Possible",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "water_level_changes"
+  },
+  {
+    "name": "Barbed Wire",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "barbed_wire"
+  },
+  {
+    "name": "Fence",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "fence"
+  },
+  {
+    "name": "Locked Entrance",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "locked_entrance"
+  },
+  {
+    "name": "Neighborhood Watch",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "neighborhood_watch"
+  },
+  {
+    "name": "Active Neighbors",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "active_neighbors"
+  },
+  {
+    "name": "High Visibility Area",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "high_visibility_area"
+  },
+  {
+    "name": "Frequent Foot Traffic",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "frequent_foot_traffic"
+  },
+  {
+    "name": "Easy Access",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "easy_access"
+  },
+  {
+    "name": "Difficult Access",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "difficult_access"
+  },
+  {
+    "name": "Low Cell Signal",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "low_cell_signal"
+  },
+  {
+    "name": "Underground Access",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "underground_access"
+  },
+  {
+    "name": "Roof Access",
+    "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+    "value": "roof_access"
+  }
 ]

@@ -1,13 +1,9 @@
-// Add this endpoint for when a user visits/claims a location
-// api/locations/visit.js
-
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
-const LOCATIONS_COL = 'locations';
-const USERS_COL = 'users';
+const COMMENTS_COL = 'comments';
 
 let cachedClient = null;
 
@@ -60,47 +56,33 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
+    const { locationId, text } = req.body;
+    if (!locationId || !text || !text.trim()) {
+        return res.status(400).json({ error: 'Location ID and text are required' });
     }
 
     try {
         const client = await getClient();
-        const locationsCol = client.db(DB).collection(LOCATIONS_COL);
-        const usersCol = client.db(DB).collection(USERS_COL);
+        const commentsCol = client.db(DB).collection(COMMENTS_COL);
         const { ObjectId } = await import('mongodb');
-
-        // Check if location is in user's unclaimed list
-        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        const unclaimedIds = user.unclaimedLocationIds || [];
         
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
-        }
-
-        // Move from unclaimed to earned
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
-            }
-        );
-
-        // Increment visitor count for the location
-        await locationsCol.updateOne(
-            { _id: new ObjectId(locationId) },
-            { $inc: { visitorCount: 1 } }
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: 'Location claimed and explored!'
+        const comment = {
+            locationId: new ObjectId(locationId),
+            userId: new ObjectId(userId),
+            text: text.trim(),
+            votes: [],
+            createdAt: new Date()
+        };
+        
+        const result = await commentsCol.insertOne(comment);
+        
+        return res.status(200).json({ 
+            success: true, 
+            commentId: result.insertedId.toString()
         });
-
+        
     } catch (err) {
-        console.error('Visit location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Post comment error:', err);
+        return res.status(500).json({ error: 'Failed to post comment' });
     }
 }
