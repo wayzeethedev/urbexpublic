@@ -790,7 +790,7 @@ async function submitLocation(e) {
     };
     
     try {
-        const response = await fetch('/api/locations/create', {
+        const response = await fetch('/locations/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
