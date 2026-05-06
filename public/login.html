@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Login - Vestige</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Sign In — Vestige</title>
 
 <style>
 *{box-sizing:border-box}
@@ -35,6 +35,7 @@ h1{
 font-size:34px;
 margin:0;
 font-weight:600;
+letter-spacing:-0.5px;
 }
 
 h2{
@@ -71,11 +72,13 @@ background:#fafafa;
 font-size:16px;
 outline:none;
 transition:all 0.2s;
+font-family:inherit;
 }
 
 input:focus{
 background:#fff;
 border-color:#111;
+box-shadow:0 0 0 2px rgba(0,0,0,0.05);
 }
 
 button{
@@ -154,14 +157,48 @@ font-size:13px;
 
 .back-link:hover{
 color:#111;
+text-decoration:underline;
+}
+
+/* Spinner overlay for auth check */
+#auth-check-overlay{
+position:fixed;
+inset:0;
+background:#fff;
+z-index:10000;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+gap:20px;
+}
+
+.check-spinner{
+width:44px;
+height:44px;
+border:3px solid #f0f0f0;
+border-top:3px solid #111;
+border-radius:50%;
+animation:spin 0.8s linear infinite;
+}
+
+.check-text{
+font-size:14px;
+color:#666;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
+<!-- Loading overlay for auth check (avoid flash of login page if already logged in) -->
+<div id="auth-check-overlay">
+<div class="check-spinner"></div>
+<div class="check-text">Checking session...</div>
+</div>
+
+<div class="container" style="display:none;">
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2288%22 height%3D%2288%22 viewBox%3D%220 0 100 100%22%3E%3Ccircle cx%3D%2250%22 cy%3D%2250%22 r%3D%2245%22 fill%3D%22%23111%22%2F%3E%3Cpath fill%3D%22%23fff%22 d%3D%22M50 30 L65 55 L55 55 L55 70 L45 70 L45 55 L35 55 Z%22%2F%3E%3C%2Fsvg%3E'"/>
 <h1>Vestige</h1>
 <h2>Sign in to your account</h2>
 
@@ -203,26 +240,57 @@ Don't have an account? <a href="/">Request Access</a>
 </div>
 
 <script>
-// Check if already logged in
-async function checkAuth() {
-  try {
-    const response = await fetch('/api/check-auth', {
-      credentials: 'include' // Include cookies
-    });
-    
-    if (response.ok) {
-      // Already logged in, redirect to map
-      window.location.href = '/map.html';
-    }
-  } catch (error) {
-    // Not logged in, that's fine
-    console.log('Not authenticated');
-  }
+// ---------- CLOUDFLARE FIX: Use relative API paths (works behind any proxy) ----------
+// All fetch calls use relative URLs which work behind Cloudflare, nginx, etc.
+function apiUrl(endpoint) {
+    // ensure leading slash for consistency
+    return endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 }
 
-// Run auth check on page load
-checkAuth();
+let isRedirecting = false;
 
+// Immediately check authentication and redirect if already logged in
+async function checkAuthAndRedirect() {
+    const overlay = document.getElementById('auth-check-overlay');
+    const container = document.querySelector('.container');
+    
+    try {
+        // Use relative path – works with Cloudflare, no hardcoded domain
+        const response = await fetch(apiUrl('/api/check-auth'), {
+            method: 'GET',
+            credentials: 'include', // critical: send session cookie
+            headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache, no-store'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // If user is authenticated, redirect to map page
+            if (data.authenticated === true && data.user) {
+                if (!isRedirecting) {
+                    isRedirecting = true;
+                    window.location.href = '/map.html';
+                    return;
+                }
+            }
+        }
+        // Not authenticated → show login form
+        if (overlay) overlay.style.display = 'none';
+        if (container) container.style.display = 'block';
+    } catch (err) {
+        // Network error or backend unreachable — but still show login (graceful)
+        console.warn('Auth check network error (Cloudflare proxy?):', err);
+        if (overlay) overlay.style.display = 'none';
+        if (container) container.style.display = 'block';
+    }
+}
+
+// Run auth check immediately
+checkAuthAndRedirect();
+
+// ---------- Login form logic with relative API ----------
 const form = document.getElementById('login-form');
 const identifierInput = document.getElementById('identifier');
 const passwordInput = document.getElementById('password');
@@ -230,64 +298,137 @@ const submitBtn = document.getElementById('submit-btn');
 const errorMessageDiv = document.getElementById('error-message');
 
 function showError(message) {
-  errorMessageDiv.textContent = message;
-  errorMessageDiv.style.display = 'block';
-  submitBtn.disabled = false;
-  submitBtn.textContent = 'Sign In';
+    if (!errorMessageDiv) return;
+    errorMessageDiv.textContent = message;
+    errorMessageDiv.style.display = 'block';
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+    }
+    // Scroll to error for better UX
+    errorMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-form.onsubmit = async (e) => {
-  e.preventDefault();
-  errorMessageDiv.style.display = 'none';
-  
-  const identifier = identifierInput.value.trim();
-  const password = passwordInput.value;
+function clearError() {
+    if (errorMessageDiv) {
+        errorMessageDiv.style.display = 'none';
+        errorMessageDiv.textContent = '';
+    }
+}
 
-  if (!identifier) {
-    showError('Please enter your username or email.');
-    return;
-  }
-  
-  if (!password) {
-    showError('Please enter your password.');
-    return;
-  }
+if (form) {
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        clearError();
+        
+        const identifier = identifierInput ? identifierInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value : '';
 
-  // Disable button and show loading state
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="loader"></span>Signing In...';
+        if (!identifier) {
+            showError('Please enter your username or email address.');
+            return;
+        }
+        
+        if (!password) {
+            showError('Please enter your password.');
+            return;
+        }
 
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // Important: This includes cookies
-      body: JSON.stringify({ identifier, password }),
+        // Disable button and show loading state
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loader"></span>Signing In...';
+        }
+
+        try {
+            // Use relative API endpoint (Cloudflare safe)
+            const response = await fetch(apiUrl('/api/login'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include', // Important: sends cookies for session
+                body: JSON.stringify({ identifier, password }),
+            });
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonErr) {
+                // If response is invalid JSON (maybe HTML error page)
+                throw new Error('Server returned an invalid response. Please try again.');
+            }
+
+            if (response.ok && data.success !== false) {
+                // Store minimal user info (non-sensitive) for quick reference
+                if (data.user) {
+                    localStorage.setItem('vestige_user', JSON.stringify({
+                        id: data.user.userId || data.user.id,
+                        username: data.user.username || data.user.email?.split('@')[0],
+                        email: data.user.email
+                    }));
+                }
+                // Successful login — redirect to map page
+                window.location.href = '/map.html';
+            } else {
+                const errorMsg = data.error || data.message || 'Invalid credentials. Please try again.';
+                showError(errorMsg);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            let friendlyMessage = 'Network error. Please check your connection and try again.';
+            if (error.message && error.message.includes('Server returned')) {
+                friendlyMessage = error.message;
+            } else if (error.message && error.message.includes('Failed to fetch')) {
+                friendlyMessage = 'Unable to reach server. Please verify your internet connection.';
+            }
+            showError(friendlyMessage);
+        } finally {
+            // Only re-enable if error is showing, else redirect will happen anyway
+            if (submitBtn && errorMessageDiv && errorMessageDiv.style.display === 'block') {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        }
+    };
+}
+
+// Add keyboard support: Enter key submits form naturally
+if (passwordInput) {
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && form) {
+            e.preventDefault();
+            form.dispatchEvent(new Event('submit'));
+        }
     });
+}
 
-    const data = await response.json();
+// Optional: fallback if logo fails to load
+const logoImg = document.querySelector('.logo');
+if (logoImg) {
+    logoImg.onerror = function() {
+        this.style.display = 'none';
+        const fallback = document.createElement('div');
+        fallback.textContent = '✦';
+        fallback.style.fontSize = '64px';
+        fallback.style.fontWeight = '300';
+        fallback.style.color = '#111';
+        fallback.style.marginBottom = '8px';
+        this.parentNode.insertBefore(fallback, this);
+        this.remove();
+    };
+}
 
-    if (response.ok) {
-      // Store user info in localStorage for quick access (not sensitive)
-      localStorage.setItem('vestige_user', JSON.stringify(data.user));
-      
-      // Redirect to map page
-      window.location.href = '/map.html';
-    } else {
-      showError(data.error || 'Invalid credentials. Please try again.');
+// Additional safety: retry auth check if stuck due to slow Cloudflare response
+setTimeout(() => {
+    const overlay = document.getElementById('auth-check-overlay');
+    const container = document.querySelector('.container');
+    if (overlay && overlay.style.display !== 'none' && container && container.style.display === 'none') {
+        console.log('Auth check retry after timeout');
+        checkAuthAndRedirect();
     }
-  } catch (error) {
-    console.error('Error:', error);
-    showError('Network error. Please check your connection and try again.');
-  } finally {
-    if (errorMessageDiv.style.display === 'block') {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In';
-    }
-  }
-};
+}, 3500);
 </script>
 
 </body>

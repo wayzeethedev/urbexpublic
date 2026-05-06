@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Vestige — Invite-only community</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vestige</title>
 
 <style>
 *{box-sizing:border-box}
@@ -27,10 +27,7 @@ max-width:420px;
 text-align:center;
 }
 
-.logo{
-width:88px;
-height:auto;
-}
+.logo{width:88px}
 
 h1{font-size:34px;margin:10px 0 0;font-weight:600}
 h2{font-size:15px;font-weight:400;color:#666;margin-top:6px}
@@ -52,7 +49,6 @@ color:#fff;
 font-size:14px;
 cursor:pointer;
 transition:opacity 0.2s;
-font-weight:500;
 }
 
 button:hover{opacity:0.9}
@@ -75,7 +71,6 @@ z-index:9999;
 position:absolute;
 inset:0;
 background:rgba(0,0,0,0.6);
-backdrop-filter:blur(3px);
 }
 
 #invite-modal-box{
@@ -153,7 +148,6 @@ font-size:12px;
 color:#444;
 display:block;
 margin-bottom:6px;
-font-weight:500;
 }
 
 input,textarea{
@@ -165,13 +159,11 @@ background:#fafafa;
 font-size:16px;
 outline:none;
 transition:all 0.2s;
-font-family:inherit;
 }
 
 input:focus,textarea:focus{
 background:#fff;
 border-color:#111;
-box-shadow:0 0 0 2px rgba(0,0,0,0.05);
 }
 
 #form-error{
@@ -182,7 +174,6 @@ padding:10px;
 border-radius:10px;
 font-size:13px;
 margin-bottom:12px;
-text-align:left;
 }
 
 #success{
@@ -195,8 +186,6 @@ padding:30px 10px;
 width:50px;
 height:50px;
 margin-bottom:15px;
-color:#15803d;
-stroke:#15803d;
 }
 
 #success h4{
@@ -208,7 +197,6 @@ color:#111;
 #success p{
 margin:0;
 font-size:13px;
-color:#555;
 }
 
 .loader{
@@ -241,8 +229,8 @@ gap:20px;
 }
 
 .auth-spinner{
-width:44px;
-height:44px;
+width:50px;
+height:50px;
 border:3px solid #f0f0f0;
 border-top:3px solid #111;
 border-radius:50%;
@@ -252,43 +240,20 @@ animation:spin 0.8s linear infinite;
 .auth-text{
 font-size:14px;
 color:#666;
-font-weight:400;
-}
-
-/* small loading inside button */
-.btn-loader{
-display:inline-block;
-width:16px;
-height:16px;
-border:2px solid rgba(255,255,255,0.3);
-border-top-color:#fff;
-border-radius:50%;
-animation:spin 0.5s linear infinite;
-margin-right:8px;
-vertical-align:middle;
-}
-
-a{
-color:#111;
-text-decoration:underline;
-text-underline-offset:2px;
-}
-
-a:hover{
-color:#444;
 }
 </style>
 </head>
+
 <body>
 
 <!-- Loading overlay for auth check -->
 <div id="auth-loading">
 <div class="auth-spinner"></div>
-<div class="auth-text">Checking access...</div>
+<div class="auth-text">Checking authentication...</div>
 </div>
 
 <div class="container" style="display:none;">
-<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2288%22 height%3D%2288%22 viewBox%3D%220 0 100 100%22%3E%3Ccircle cx%3D%2250%22 cy%3D%2250%22 r%3D%2245%22 fill%3D%22%23111%22%2F%3E%3Cpath fill%3D%22%23fff%22 d%3D%22M50 30 L65 55 L55 55 L55 70 L45 70 L45 55 L35 55 Z%22%2F%3E%3C%2Fsvg%3E'"/>
+<img class="logo" src="/assets/images/logo-transparent-black.png" alt="Vestige Logo"/>
 <h1>Vestige</h1>
 <h2>Invite-only community</h2>
 
@@ -303,27 +268,28 @@ Already have an invite? <a href="/login.html">Login</a>
 
 <div id="invite-modal">
 <div id="invite-modal-backdrop"></div>
+
 <div id="invite-modal-box">
-<button id="close-modal-btn" aria-label="Close">✕</button>
+<button id="close-modal-btn">✕</button>
 
 <div id="form-container">
 <h3>Request Invite</h3>
-<p class="modal-desc">Enter your details below and we'll notify you.</p>
+<p class="modal-desc">Enter your details below.</p>
 
-<form id="form" novalidate>
+<form id="form">
 <div class="field">
-<label>Full name</label>
-<input id="name" type="text" autocomplete="name" placeholder="e.g. Alex Johnson"/>
+<label>Name</label>
+<input id="name" type="text" autocomplete="name"/>
 </div>
 
 <div class="field">
-<label>Email address</label>
-<input id="email" type="email" autocomplete="email" placeholder="hello@example.com"/>
+<label>Email</label>
+<input id="email" type="email" autocomplete="email"/>
 </div>
 
 <div class="field">
 <label>Comments <span style="color:#999;">(optional)</span></label>
-<textarea id="comments" rows="3" placeholder="Tell us why you'd like to join..."></textarea>
+<textarea id="comments" rows="3"></textarea>
 </div>
 
 <div id="form-error"></div>
@@ -338,61 +304,41 @@ Already have an invite? <a href="/login.html">Login</a>
 <polyline points="22 4 12 14.01 9 11.01"></polyline>
 </svg>
 <h4>Request Received!</h4>
-<p>We'll email you when your invite is ready.<br/>Thanks for your interest.</p>
+<p>We'll notify you when you're invited.</p>
 </div>
+
 </div>
 </div>
 
 <script>
-// ---------- CLOUDFLARE FIX: use relative API paths (no hardcoded domain) ----------
-// All fetch calls will use relative URLs which work behind any reverse proxy (Cloudflare, etc.)
-const API_BASE = ''; // relative to origin
-
-function apiUrl(endpoint) {
-    // ensure leading slash for consistency
-    return endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-}
-
-// Helper to show/hide buttons with better error handling
-let isRedirecting = false;
-
-// Immediately check authentication and redirect if already logged in
+// IMMEDIATELY check if user is logged in
 async function checkAuthAndRedirect() {
-    try {
-        // Use relative path – works with Cloudflare, nginx, etc.
-        const response = await fetch(apiUrl('/api/check-auth'), {
-            method: 'GET',
-            credentials: 'include', // important: send cookies
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            // If user is authenticated, redirect to map page
-            if (data.authenticated === true && data.user) {
-                if (!isRedirecting) {
-                    isRedirecting = true;
-                    window.location.href = '/map.html';
-                    return;
-                }
-            }
-        }
-        // Not authenticated or error → show landing page
-        document.getElementById('auth-loading').style.display = 'none';
-        const container = document.querySelector('.container');
-        if (container) container.style.display = 'block';
-    } catch (err) {
-        // Network error or backend unreachable → still show landing (graceful degradation)
-        console.warn('Auth check network error (Cloudflare proxy may be slow):', err);
-        document.getElementById('auth-loading').style.display = 'none';
-        const container = document.querySelector('.container');
-        if (container) container.style.display = 'block';
+  try {
+    const response = await fetch('/api/check-auth', {
+      credentials: 'include' // Include cookies
+    });
+    
+    if (response.ok) {
+      // User is logged in, redirect to map page immediately
+      window.location.href = '/map.html';
+      return; // Stop execution
+    } else {
+      // Not logged in, show the page
+      document.getElementById('auth-loading').style.display = 'none';
+      document.querySelector('.container').style.display = 'block';
     }
+  } catch (error) {
+    // Error or not logged in, show the page
+    console.log('Auth check failed:', error);
+    document.getElementById('auth-loading').style.display = 'none';
+    document.querySelector('.container').style.display = 'block';
+  }
 }
 
-// ---------- Invite request logic (relative API) ----------
+// Run auth check immediately when page loads
+checkAuthAndRedirect();
+
+// Rest of your modal code
 const modal = document.getElementById('invite-modal');
 const openBtn = document.getElementById('open');
 const closeBtn = document.getElementById('close-modal-btn');
@@ -404,173 +350,95 @@ const successDiv = document.getElementById('success');
 const submitBtn = document.getElementById('submit-btn');
 
 function openModal() {
-    if (!modal) return;
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    // Reset state
-    if (formContainer) formContainer.style.display = 'block';
-    if (successDiv) successDiv.style.display = 'none';
-    if (form) form.reset();
-    if (errorBox) errorBox.style.display = 'none';
-    if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Request';
-    }
-    // Clear any previous error messages
-    if (errorBox) errorBox.innerHTML = '';
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // Reset form state
+  formContainer.style.display = 'block';
+  successDiv.style.display = 'none';
+  form.reset();
+  errorBox.style.display = 'none';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send Request';
 }
 
 function closeModal() {
-    if (!modal) return;
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function showError(message) {
-    if (!errorBox) return;
-    errorBox.textContent = message;
-    errorBox.style.display = 'block';
-    if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Request';
-    }
-    // Scroll error into view inside modal box
-    const modalBox = document.getElementById('invite-modal-box');
-    if (modalBox && errorBox) {
-        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  errorBox.textContent = message;
+  errorBox.style.display = 'block';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send Request';
 }
 
-// Event listeners with null checks
-if (openBtn) openBtn.onclick = openModal;
-if (closeBtn) closeBtn.onclick = closeModal;
-if (backdrop) backdrop.onclick = closeModal;
+openBtn.onclick = openModal;
+closeBtn.onclick = closeModal;
+backdrop.onclick = closeModal;
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && modal.style.display === 'block') {
-        closeModal();
-    }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
 });
 
-if (form) {
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        if (errorBox) errorBox.style.display = 'none';
-        
-        const nameInput = document.getElementById('name');
-        const emailInput = document.getElementById('email');
-        const commentsInput = document.getElementById('comments');
-        
-        const name = nameInput ? nameInput.value.trim() : '';
-        const email = emailInput ? emailInput.value.trim() : '';
-        const comments = commentsInput ? commentsInput.value.trim() : '';
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  errorBox.style.display = 'none';
+  
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const comments = document.getElementById('comments').value.trim();
 
-        // Client-side validation
-        if (!name) {
-            showError('Please enter your full name.');
-            return;
-        }
-        
-        if (!email) {
-            showError('Please enter your email address.');
-            return;
-        }
-        
-        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showError('Please enter a valid email address (e.g., name@domain.com).');
-            return;
-        }
+  // Client-side validation
+  if (!name) {
+    showError('Please enter your name.');
+    return;
+  }
+  
+  if (!email) {
+    showError('Please enter your email address.');
+    return;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showError('Please enter a valid email address.');
+    return;
+  }
 
-        // Disable button and show loading
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loader"></span>Sending...';
-        }
+  // Disable button and show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="loader"></span>Sending...';
 
-        try {
-            // Use relative API endpoint (Cloudflare safe)
-            const response = await fetch(apiUrl('/api/request'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'include', // include cookies if any (optional)
-                body: JSON.stringify({ name, email, comments }),
-            });
+  try {
+    const response = await fetch('/api/request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, comments }),
+    });
 
-            let data;
-            try {
-                data = await response.json();
-            } catch (jsonErr) {
-                // If response is not JSON (maybe HTML error page)
-                throw new Error('Invalid server response. Please try again.');
-            }
+    const data = await response.json();
 
-            if (response.ok && data.success !== false) {
-                // Show success state
-                if (formContainer) formContainer.style.display = 'none';
-                if (successDiv) successDiv.style.display = 'block';
-                
-                // Auto-close after 3 seconds
-                setTimeout(() => {
-                    closeModal();
-                    // Reset for next modal open
-                    if (formContainer) formContainer.style.display = 'block';
-                    if (successDiv) successDiv.style.display = 'none';
-                    if (form) form.reset();
-                }, 3000);
-            } else {
-                const errorMsg = data.error || data.message || 'Request failed. Please try again later.';
-                showError(errorMsg);
-            }
-        } catch (error) {
-            console.error('Invite request error:', error);
-            let friendlyMessage = 'Network error. Please check your connection and try again.';
-            if (error.message && error.message.includes('Failed to fetch')) {
-                friendlyMessage = 'Unable to reach server. Verify your internet and try again.';
-            }
-            showError(friendlyMessage);
-        }
-    };
-}
-
-// Additional safety: retry auth check if page loads slowly (for Cloudflare cache edge cases)
-setTimeout(() => {
-    const loadingEl = document.getElementById('auth-loading');
-    const containerEl = document.querySelector('.container');
-    if (loadingEl && loadingEl.style.display !== 'none' && containerEl && containerEl.style.display === 'none') {
-        // Stuck loading, try again
-        console.log('Auth check fallback retry');
-        checkAuthAndRedirect();
+    if (response.ok) {
+      // Show success message
+      formContainer.style.display = 'none';
+      successDiv.style.display = 'block';
+      
+      // Auto-close modal after 3 seconds
+      setTimeout(() => {
+        closeModal();
+      }, 3000);
+    } else {
+      showError(data.error || 'Something went wrong. Please try again.');
     }
-}, 3000);
-
-// ----- add smooth URL handling for any missing assets (fallback for logo) -----
-// ensure that any broken image doesn't break layout
-const logoImg = document.querySelector('.logo');
-if (logoImg) {
-    logoImg.onerror = function() {
-        this.style.display = 'none';
-        // create simple text fallback
-        const fallback = document.createElement('div');
-        fallback.textContent = '✦';
-        fallback.style.fontSize = '64px';
-        fallback.style.fontWeight = '300';
-        fallback.style.color = '#111';
-        fallback.style.marginBottom = '8px';
-        this.parentNode.insertBefore(fallback, this);
-        this.remove();
-    };
-}
-
-// Run auth check immediately when page loads (DOMContentLoaded also safe)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
-} else {
-    checkAuthAndRedirect();
-}
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Network error. Please check your connection and try again.');
+  }
+};
 </script>
+
 </body>
 </html>
