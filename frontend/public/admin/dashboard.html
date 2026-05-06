@@ -588,7 +588,7 @@ let currentEditUserId = null;
 let currentGiftUserId = null;
 
 async function checkAuth() {
-    const response = await fetch('/api/check-auth', { credentials: 'include' });
+    const response = await fetch('https://urbexpublicapi.onrender.com//api/check-auth', { credentials: 'include' });
     if (!response.ok) {
         window.location.href = '/login.html';
         return null;
@@ -611,7 +611,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
 
 async function loadPendingLocations() {
     try {
-        const response = await fetch('/api/locations/pending', { credentials: 'include' });
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/locations/pending', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             pendingLocations = data.locations || [];
@@ -673,7 +673,7 @@ async function approveLocation(locationId) {
     card.classList.add('processing');
     
     try {
-        const response = await fetch('/api/locations/approve', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/locations/approve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -702,7 +702,7 @@ async function denyLocation(locationId) {
     card.classList.add('processing');
     
     try {
-        const response = await fetch('/api/locations/approve', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/locations/approve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -728,7 +728,7 @@ async function denyLocation(locationId) {
 
 async function loadInvites() {
     try {
-        const response = await fetch('/api/admin/invites', { credentials: 'include' });
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/invites', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             allInvites = data.invites || [];
@@ -782,7 +782,7 @@ async function acceptInvite(inviteId) {
     row.classList.add('processing');
     
     try {
-        const response = await fetch('/api/admin/accept-invite', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/accept-invite', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -808,7 +808,7 @@ async function denyInvite(inviteId) {
     row.classList.add('processing');
     
     try {
-        const response = await fetch('/api/admin/deny-invite', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/deny-invite', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -831,7 +831,7 @@ async function denyInvite(inviteId) {
 
 async function loadComments() {
     try {
-        const response = await fetch('/api/admin/comments', { credentials: 'include' });
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/comments', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             allComments = data.comments || [];
@@ -876,7 +876,7 @@ async function deleteComment(commentId) {
     row.classList.add('processing');
     
     try {
-        const response = await fetch('/api/admin/delete-comment', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/delete-comment', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -900,8 +900,8 @@ async function deleteComment(commentId) {
 async function loadUsers() {
     try {
         const [usersRes, locationsRes] = await Promise.all([
-            fetch('/api/admin/users', { credentials: 'include' }),
-            fetch('/api/locations/approved', { credentials: 'include' })
+            fetch('https://urbexpublicapi.onrender.com//api/admin/users', { credentials: 'include' }),
+            fetch('https://urbexpublicapi.onrender.com//api/locations/approved', { credentials: 'include' })
         ]);
         
         if (usersRes.ok) {
@@ -1042,7 +1042,7 @@ async function saveUserEdit(event) {
     row.classList.add('processing');
     
     try {
-        const response = await fetch('/api/admin/update-user', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/update-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -1094,7 +1094,7 @@ async function submitGift(event) {
     }
     
     try {
-        const response = await fetch('/api/admin/gift-nearest-locations', {
+        const response = await fetch('https://urbexpublicapi.onrender.com//api/admin/gift-nearest-locations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
