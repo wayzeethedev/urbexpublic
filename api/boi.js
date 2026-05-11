@@ -430,7 +430,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== ADMIN INVITE ENDPOINTS ====================
-    if (url === '/api/admin/invites' || url === '/invites') {
+    if (url === '/api/admin-invites' || url === '/invites') {
         if (setMethodHeaders(['GET'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -445,7 +445,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/approve-invite' || url === '/approve') {
+    if (url === '/api/admin-approve-invite' || url === '/approve') {
         if (setMethodHeaders(['POST'])) return;
         
         const adminKey = req.headers['x-admin-key'];
@@ -481,7 +481,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/accept-invite' || url === '/accept-invite') {
+    if (url === '/api/admin-accept-invite' || url === '/accept-invite') {
         if (setMethodHeaders(['POST'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -502,7 +502,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/deny-invite' || url === '/deny-invite') {
+    if (url === '/api/admin-deny-invite' || url === '/deny-invite') {
         if (setMethodHeaders(['POST'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -524,7 +524,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== ADMIN USER ENDPOINTS ====================
-    if (url === '/api/admin/users' || url === '/users') {
+    if (url === '/api/admin-users' || url === '/users') {
         if (setMethodHeaders(['GET'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -543,7 +543,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/update-user' || url === '/update-user') {
+    if (url === '/api/admin-update-user' || url === '/update-user') {
         if (setMethodHeaders(['POST'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -694,7 +694,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== ADMIN COMMENT ENDPOINTS ====================
-    if (url === '/api/admin/comments' || url === '/admin/comments') {
+    if (url === '/api/admin-comments' || url === '/admin/comments') {
         if (setMethodHeaders(['GET'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -734,7 +734,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/delete-comment' || url === '/delete-comment') {
+    if (url === '/api/admin-delete-comment' || url === '/delete-comment') {
         if (setMethodHeaders(['DELETE'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -756,7 +756,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== ADMIN GIFT ENDPOINTS ====================
-    if (url === '/api/admin/gift-locations' || url === '/gift-locations') {
+    if (url === '/api/admin-gift-locations' || url === '/gift-locations') {
         if (setMethodHeaders(['POST'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -781,7 +781,7 @@ export default async function handler(req, res) {
         }
     }
     
-    if (url === '/api/admin/gift-nearest-locations' || url === '/gift-nearest-locations') {
+    if (url === '/api/admin-gift-nearest-locations' || url === '/gift-nearest-locations') {
         if (setMethodHeaders(['POST'])) return;
         if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden - Admin only' });
         
@@ -838,7 +838,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== USER DASHBOARD ENDPOINTS ====================
-    if (url === '/api/user/dashboard' || url === '/dashboard') {
+    if (url === '/api/user-dashboard' || url === '/dashboard') {
         if (setMethodHeaders(['GET'])) return;
         
         const userId = getUserIdFromCookie(req);
@@ -912,7 +912,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== USER POINTS ENDPOINTS ====================
-    if (url === '/api/user/points' || url === '/points') {
+    if (url === '/api/user-points' || url === '/points') {
         if (setMethodHeaders(['GET'])) return;
         
         const userId = getUserIdFromCookie(req);
@@ -934,7 +934,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== DAILY LOCATIONS ====================
-    if (url === '/api/user/daily-locations' || url === '/daily-locations') {
+    if (url === '/api/user-daily-locations' || url === '/daily-locations') {
         if (setMethodHeaders(['GET', 'POST'])) return;
         
         const userId = getUserIdFromCookie(req);
@@ -1266,7 +1266,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== UNLOCKED LOCATIONS ====================
-    if (url === '/api/user/unlocked-locations' || url === '/unlocked-locations') {
+    if (url === '/api/user-unlocked-locations' || url === '/unlocked-locations') {
         if (method === 'OPTIONS') {
             setCorsHeaders(res);
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -1408,7 +1408,7 @@ export default async function handler(req, res) {
     }
     
     // ==================== LOCATION SUBMISSION (CREATE) ====================
-    if (url === '/api/locations/create' || url === '/locations/create') {
+    if (url === '/api/locations-create' || url === '/locations/create') {
         if (setMethodHeaders(['POST'])) return;
         
         const userId = getUserIdFromCookie(req);

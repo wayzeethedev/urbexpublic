@@ -726,7 +726,7 @@ async function getUserInfo() {
 
 async function getUserDashboard() {
     try {
-        const response = await fetch('/api/user/dashboard', { credentials: 'include' });
+        const response = await fetch('/api/user-dashboard', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             earnedLocations = data.earnedLocations || [];
@@ -743,7 +743,7 @@ async function getUserDashboard() {
 
 async function loadAllLocations() {
     try {
-        const response = await fetch('/api/locations/approved', { credentials: 'include' });
+        const response = await fetch('/api/locations-approved', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             allLocations = data.locations || [];
@@ -759,7 +759,7 @@ async function loadAllLocations() {
 async function getComments(locationId) {
     console.log('Fetching comments for location:', locationId);
     try {
-        const response = await fetch(`/api/locations/comments?locationId=${locationId}`, { 
+        const response = await fetch(`/api/locations-comments?locationId=${locationId}`, { 
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -799,7 +799,7 @@ async function postComment(locationId, text) {
     commentInput.value = '';
     
     try {
-        const response = await fetch('/api/locations/comments', {
+        const response = await fetch('/api/locations-comments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -1168,7 +1168,7 @@ async function claimDailyLocations() {
     if (!userLocation) return;
     
     try {
-        const response = await fetch('/api/user/daily-locations', {
+        const response = await fetch('/api/user-daily-locations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -1198,7 +1198,7 @@ function escapeHtml(text) {
 
 async function claimLocation(locationId) {
     try {
-        const response = await fetch('/api/user/claim-location', {
+        const response = await fetch('/api/user-claim-location', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -1219,7 +1219,7 @@ async function claimLocation(locationId) {
 
 async function claimAllLocations() {
     try {
-        const response = await fetch('/api/user/claim-all', {
+        const response = await fetch('/api/user-claim-all', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -1240,7 +1240,7 @@ async function claimAllLocations() {
 async function loadDashboardData() {
     const container = document.getElementById('modal-content-inner');
     try {
-        const response = await fetch('/api/user/dashboard', { credentials: 'include' });
+        const response = await fetch('/api/user-dashboard', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             const availableDaily = data.user.daysSinceSignup - data.user.dailyLocationsClaimed;

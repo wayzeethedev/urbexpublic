@@ -1,3 +1,4 @@
+// /api/[...route].js
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -136,156 +137,165 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
     
-    const { route } = req.query;
-    const path = route.join('/');
+    // Parse route from req.url
+    const route = req.url.split("?")[0].replace(/^\/api\//, "").replace(/\/$/, "");
     
-    // Route to appropriate handler
-    try {
+    const routes = {
         // ========== AUTH ROUTES ==========
-        if (path === 'check-auth' && req.method === 'GET') {
+        "check-auth": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleCheckAuth(req, res);
-        }
-        
-        if (path === 'login' && req.method === 'POST') {
+        },
+        "login": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleLogin(req, res);
-        }
-        
-        if (path === 'logout' && req.method === 'POST') {
+        },
+        "logout": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleLogout(req, res);
-        }
-        
-        if (path === 'register' && req.method === 'POST') {
+        },
+        "register": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleRegister(req, res);
-        }
-        
-        if (path === 'request' && req.method === 'POST') {
+        },
+        "request": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleRequestInvite(req, res);
-        }
-        
-        if (path === 'verify-token' && req.method === 'POST') {
+        },
+        "verify-token": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleVerifyToken(req, res);
-        }
+        },
         
         // ========== USER ROUTES ==========
-        if (path === 'user/dashboard' && req.method === 'GET') {
+        "user-dashboard": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUserDashboard(req, res);
-        }
-        
-        if (path === 'user/points' && req.method === 'GET') {
+        },
+        "user-points": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUserPoints(req, res);
-        }
-        
-        if (path === 'user/claim-location' && req.method === 'POST') {
+        },
+        "user-claim-location": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleClaimLocation(req, res);
-        }
-        
-        if (path === 'user/claim-all' && req.method === 'POST') {
+        },
+        "user-claim-all": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleClaimAll(req, res);
-        }
-        
-        if (path === 'user/daily-locations' && (req.method === 'GET' || req.method === 'POST')) {
+        },
+        "user-daily-locations": async () => {
+            if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleDailyLocations(req, res);
-        }
-        
-        if (path === 'user/unlocked-locations' && (req.method === 'GET' || req.method === 'POST')) {
+        },
+        "user-unlocked-locations": async () => {
+            if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUnlockedLocations(req, res);
-        }
-        
-        if (path === 'user/visit-location' && req.method === 'POST') {
+        },
+        "user-visit-location": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleVisitLocation(req, res);
-        }
-        
-        if (path === 'user/upload-photo' && req.method === 'POST') {
+        },
+        "user-upload-photo": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUploadPhoto(req, res);
-        }
-        
-        if (path === 'user/upload-cover' && req.method === 'POST') {
+        },
+        "user-upload-cover": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUploadCover(req, res);
-        }
+        },
         
         // ========== LOCATION ROUTES ==========
-        if (path === 'locations/create' && req.method === 'POST') {
+        "locations-create": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleCreateLocation(req, res);
-        }
-        
-        if (path === 'locations/approved' && req.method === 'GET') {
+        },
+        "locations-approved": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetApprovedLocations(req, res);
-        }
-        
-        if (path === 'locations/pending' && req.method === 'GET') {
+        },
+        "locations-pending": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetPendingLocations(req, res);
-        }
-        
-        if (path === 'locations/approve' && req.method === 'POST') {
+        },
+        "locations-approve": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleApproveLocation(req, res);
-        }
-        
-        if (path === 'locations/comments' && req.method === 'GET') {
+        },
+        "locations-comments": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetLocationComments(req, res);
-        }
-        
-        if (path === 'locations/upload-image' && req.method === 'POST') {
+        },
+        "locations-upload-image": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUploadLocationImage(req, res);
-        }
-        
-        if (path === 'locations/comments/vote' && req.method === 'POST') {
+        },
+        "locations-comments-vote": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleVoteComment(req, res);
-        }
-        
-        // Handle dynamic location comments: locations/comments/[locationId]
-        if (path.match(/^locations\/comments\/[^/]+$/) && req.method === 'GET') {
-            const locationId = path.split('/')[2];
-            return await handleGetCommentsByLocationId(req, res, locationId);
-        }
+        },
         
         // ========== ADMIN ROUTES ==========
-        if (path === 'admin/invites' && req.method === 'GET') {
+        "admin-invites": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetInvites(req, res);
-        }
-        
-        if (path === 'admin/accept-invite' && req.method === 'POST') {
+        },
+        "admin-accept-invite": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleAcceptInvite(req, res);
-        }
-        
-        if (path === 'admin/deny-invite' && req.method === 'POST') {
+        },
+        "admin-deny-invite": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleDenyInvite(req, res);
-        }
-        
-        if (path === 'admin/approve' && req.method === 'POST') {
+        },
+        "admin-approve": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleAdminApproveUser(req, res);
-        }
-        
-        if (path === 'admin/comments' && req.method === 'GET') {
+        },
+        "admin-comments": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetAllComments(req, res);
-        }
-        
-        if (path === 'admin/delete-comment' && req.method === 'DELETE') {
+        },
+        "admin-delete-comment": async () => {
+            if (req.method !== 'DELETE') return res.status(405).json({ error: 'Method not allowed' });
             return await handleDeleteComment(req, res);
-        }
-        
-        if (path === 'admin/users' && req.method === 'GET') {
+        },
+        "admin-users": async () => {
+            if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGetUsers(req, res);
-        }
-        
-        if (path === 'admin/update-user' && req.method === 'POST') {
+        },
+        "admin-update-user": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleUpdateUser(req, res);
-        }
-        
-        if (path === 'admin/gift-locations' && req.method === 'POST') {
+        },
+        "admin-gift-locations": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGiftLocations(req, res);
-        }
-        
-        if (path === 'admin/gift-nearest-locations' && req.method === 'POST') {
+        },
+        "admin-gift-nearest-locations": async () => {
+            if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
             return await handleGiftNearestLocations(req, res);
         }
-        
-        // 404
-        return res.status(404).json({ error: `Route not found: ${path}` });
-        
-    } catch (err) {
-        console.error('API Error:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+    };
+    
+    // Handle dynamic location comments: locations/comments/[locationId]
+    if (route.match(/^locations\/comments\/[^/]+$/) && req.method === 'GET') {
+        const locationId = route.split('/')[2];
+        return await handleGetCommentsByLocationId(req, res, locationId);
     }
+    
+    // Check if route exists
+    if (routes[route]) {
+        try {
+            return await routes[route]();
+        } catch (err) {
+            console.error('Route handler error:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    
+    // Fallback 404
+    return res.status(404).json({ error: "Not found", route });
 }
 
 // ============================================
