@@ -1123,11 +1123,25 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
     console.log('Submitting location data:', locationData);
     
     try {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        const response = await fetch('/locations/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(locationData)
+=======
+>>>>>>> save-work
         const response = await fetch('/api/locations/create', { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
             credentials: 'include', 
             body: JSON.stringify(locationData) 
+<<<<<<< HEAD
+=======
+>>>>>>> 5440ca1 (boy)
+>>>>>>> save-work
         });
         const data = await response.json();
         if (response.ok && data.success) {
