@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Building",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "building"
+    },
+    {
+        "name": "Tower",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "tower"
+    },
+    {
+        "name": "Bridge",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "bridge"
+    },
+    {
+        "name": "Cave",
+        "icon": "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
+        "value": "cave"
+    }
+]

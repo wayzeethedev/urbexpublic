@@ -1,13 +1,9 @@
-// Add this endpoint for when a user visits/claims a location
-// api/locations/visit.js
-
 import { MongoClient } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
 const uri = process.env.MONGODB_URI;
 const DB = 'vestige';
 const LOCATIONS_COL = 'locations';
-const USERS_COL = 'users';
 
 let cachedClient = null;
 
@@ -61,47 +57,54 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { locationId } = req.body;
-    if (!locationId) {
-        return res.status(400).json({ error: 'Location ID required' });
+    const { title, description, images, level, tags, coordinates } = req.body;
+    
+    // Validate required fields
+    if (!title || !description || !coordinates || !level) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!coordinates.lat || !coordinates.lng) {
+        return res.status(400).json({ error: 'Valid coordinates are required' });
     }
 
     try {
         const client = await getClient();
         const locationsCol = client.db(DB).collection(LOCATIONS_COL);
-        const usersCol = client.db(DB).collection(USERS_COL);
         const { ObjectId } = await import('mongodb');
 
-        // Check if location is in user's unclaimed list
-        const user = await usersCol.findOne({ _id: new ObjectId(userId) });
-        const unclaimedIds = user.unclaimedLocationIds || [];
+        // Create location object
+        const newLocation = {
+            title,
+            description,
+            images: images || [],
+            level: level.value || level,
+            tags: tags || [],
+            coordinates: {
+                type: 'Point',
+                coordinates: [coordinates.lng, coordinates.lat] // GeoJSON format: [longitude, latitude]
+            },
+            createdBy: new ObjectId(userId),
+            createdAt: new Date(),
+            status: 'pending', // pending, approved, rejected
+            visitorCount: 0,
+            likes: 0
+        };
+
+        const result = await locationsCol.insertOne(newLocation);
         
-        if (!unclaimedIds.includes(locationId)) {
-            return res.status(400).json({ error: 'Location not available to claim' });
+        if (!result.acknowledged) {
+            throw new Error('Failed to insert location');
         }
-
-        // Move from unclaimed to earned
-        await usersCol.updateOne(
-            { _id: new ObjectId(userId) },
-            {
-                $pull: { unclaimedLocationIds: locationId },
-                $addToSet: { earnedLocationIds: locationId }
-            }
-        );
-
-        // Increment visitor count for the location
-        await locationsCol.updateOne(
-            { _id: new ObjectId(locationId) },
-            { $inc: { visitorCount: 1 } }
-        );
 
         return res.status(200).json({
             success: true,
-            message: 'Location claimed and explored!'
+            message: 'Location submitted for approval',
+            locationId: result.insertedId
         });
 
     } catch (err) {
-        console.error('Visit location error:', err);
-        return res.status(500).json({ error: 'Failed to claim location' });
+        console.error('Create location error:', err);
+        return res.status(500).json({ error: 'Failed to create location' });
     }
 }
