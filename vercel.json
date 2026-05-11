@@ -1,10 +1,14 @@
 {
+<<<<<<< HEAD
   "functions": {
     "api/**/*.js": {
       "maxDuration": 10
     }
   },
   "routes": [
+=======
+  "rewrites": [
+>>>>>>> 5440ca1 (boy)
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
