@@ -1,24 +1,8 @@
 {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 10
-    }
-  },
-  "routes": [
-=======
->>>>>>> save-work
   "rewrites": [
->>>>>>> 5440ca1 (boy)
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
